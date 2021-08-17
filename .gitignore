@@ -1,0 +1,30 @@
+# Created by .ignore support plugin (hsz.mobi)
+# 我们做的每个Git项目中都需要一个".gitignore"文件，这个文件的作用就是告诉Git哪些文件不需要添加到版本管理中。
+
+
+# 配置语法如下
+#   1. 以斜杠/开头表示目录
+#   2. 以星号*通配多个字符
+#   3. 以问号?通配单个字符
+#   4. 以方括号[]包含单个字符的匹配列表
+#   5. 以叹号!表示不忽略(跟踪)匹配到的文件或目录
+# 注：Git对于 .ignore 配置文件是按行从上到下进行规则匹配的，意味着如果前面的规则匹配的范围更大，则后面的规则将不会生效
+
+
+# intellij files
+.idea/
+*.iml
+*.ipr
+*.iws
+build-idea/
+
+# eclipse and intellij put there build files in "out"
+out/
+target/
+
+# osx stuff
+.DS_Store
+
+# gradle stuff
+.gradle/
+build/
