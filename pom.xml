@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
     <version>1.0</version>
     <modules>
-        <module>marketing-rule-engine</module>
+        <module>marketing-engine</module>
     </modules>
 
     <properties>
