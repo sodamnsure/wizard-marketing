@@ -15,6 +15,18 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <commons.lang3.version>3.8.1</commons.lang3.version>
+        <kafka.clients.version>2.7.0</kafka.clients.version>
+        <hbase.client.version>2.0.6</hbase.client.version>
+        <flink.version>1.12.0</flink.version>
+        <mysql.version>8.0.20</mysql.version>
+        <redis.version>3.6.1</redis.version>
+        <clickhouse.version>1.6-stable</clickhouse.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <log4j.slf4j.version>2.11.1</log4j.slf4j.version>
+        <jackson.version>2.9.5</jackson.version>
+        <lombok.version>1.18.12</lombok.version>
+        <drools.version>7.33.0.Final</drools.version>
     </properties>
 
     <repositories>
@@ -34,6 +46,128 @@
             </snapshots>
         </repository>
     </repositories>
+
+    <!-- 父工程中对子工程中依赖的统一管理，比如定义统一的 version，定义统一的 exclusions -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.clients.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-client</artifactId>
+                <version>${hbase.client.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-common</artifactId>
+                <version>${hbase.client.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- flink依赖包 -->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-streaming-java_2.11</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-clients_2.11</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-kafka_2.11</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-runtime-web_2.11</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-jdbc_2.11</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <!-- mysql驱动 -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+            <!-- clickhouse驱动 -->
+            <dependency>
+                <groupId>com.github.housepower</groupId>
+                <artifactId>clickhouse-native-jdbc</artifactId>
+                <version>${clickhouse.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${redis.version}</version>
+            </dependency>
+            <!-- 日志 -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <!-- 桥接器 -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${log4j.slf4j.version}</version>
+            </dependency>
+            <!-- log4j2的jar包 -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.slf4j.version}</version>
+            </dependency>
+            <!-- drools规则引擎 -->
+            <dependency>
+                <groupId>org.drools</groupId>
+                <artifactId>drools-compiler</artifactId>
+                <version>${drools.version}</version>
+            </dependency>
+            <!-- 类构造工具包 -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <!-- Jackson Json处理工具包 -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
