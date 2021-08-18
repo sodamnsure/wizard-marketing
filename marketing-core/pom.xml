@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>marketing-engine</artifactId>
+    <artifactId>marketing-core</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
