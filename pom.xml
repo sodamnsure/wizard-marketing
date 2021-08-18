@@ -26,6 +26,7 @@
         <log4j.slf4j.version>2.11.1</log4j.slf4j.version>
         <jackson.version>2.9.5</jackson.version>
         <lombok.version>1.18.12</lombok.version>
+        <typesafe.version>1.4.0</typesafe.version>
         <drools.version>7.33.0.Final</drools.version>
     </properties>
 
@@ -165,6 +166,12 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <!-- 配置文件解析工具 -->
+            <dependency>
+                <groupId>com.typesafe</groupId>
+                <artifactId>config</artifactId>
+                <version>${typesafe.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
