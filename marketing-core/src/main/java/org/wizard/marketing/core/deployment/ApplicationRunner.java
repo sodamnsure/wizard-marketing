@@ -1,10 +1,14 @@
 package org.wizard.marketing.core.deployment;
 
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.wizard.marketing.core.beans.EventBean;
+import org.wizard.marketing.core.function.JsonToBeanMapFunction;
 import org.wizard.marketing.core.source.KafkaSourceBuilder;
+
+import java.util.Objects;
 
 /**
  * @Author: sodamnsure
@@ -16,8 +20,11 @@ public class ApplicationRunner {
         LocalStreamEnvironment env = StreamExecutionEnvironment.createLocalEnvironment(new Configuration());
 
         KafkaSourceBuilder kafkaSourceBuilder = new KafkaSourceBuilder();
-        DataStreamSource<String> stream = env.addSource(kafkaSourceBuilder.build("ActionLog"));
-        stream.print();
+        DataStream<String> stream = env.addSource(kafkaSourceBuilder.build("ActionLog"));
+
+        DataStream<EventBean> eventStreamWithBean = stream.map(new JsonToBeanMapFunction()).filter(Objects::nonNull);
+
+        eventStreamWithBean.print();
 
         env.execute();
     }
