@@ -1,4 +1,4 @@
-package org.wizard.marketing.core.source;
+package org.wizard.marketing.core.sources;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;

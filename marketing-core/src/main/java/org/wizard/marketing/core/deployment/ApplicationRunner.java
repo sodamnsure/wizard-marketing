@@ -6,8 +6,8 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.wizard.marketing.core.beans.EventBean;
-import org.wizard.marketing.core.function.JsonToBeanMapFunction;
-import org.wizard.marketing.core.source.KafkaSourceBuilder;
+import org.wizard.marketing.core.functions.JsonToBeanMapFunction;
+import org.wizard.marketing.core.sources.KafkaSourceBuilder;
 
 import java.util.Objects;
 

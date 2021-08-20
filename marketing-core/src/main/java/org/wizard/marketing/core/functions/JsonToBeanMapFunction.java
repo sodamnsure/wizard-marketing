@@ -1,4 +1,4 @@
-package org.wizard.marketing.core.function;
+package org.wizard.marketing.core.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.wizard.marketing.core.beans.EventBean;

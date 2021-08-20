@@ -1,4 +1,4 @@
-package org.wizard.marketing.core.function;
+package org.wizard.marketing.core.functions;
 
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
@@ -13,7 +13,7 @@ import org.wizard.marketing.core.beans.ResultBean;
 public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, EventBean, ResultBean> {
 
     @Override
-    public void processElement(EventBean eventBean, Context context, Collector<ResultBean> collector) {
+    public void processElement(EventBean eventBean, Context context, Collector<ResultBean> collector) throws Exception {
 
     }
 }
