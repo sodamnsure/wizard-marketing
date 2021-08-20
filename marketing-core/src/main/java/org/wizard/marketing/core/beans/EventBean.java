@@ -1,22 +1,17 @@
 package org.wizard.marketing.core.beans;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-
-import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
+import org.wizard.marketing.core.beans.basic.Unit;
 
 /**
  * @Author: sodamnsure
  * @Date: 2021/8/19 10:19 上午
  * @Desc: 事件对象
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
-public class EventBean {
+@Getter
+@Setter
+public class EventBean extends Unit {
     private String account;
     private String appId;
     private String appVersion;
@@ -33,6 +28,4 @@ public class EventBean {
     private String resolution;
     private String sessionId;
     private Long timeStamp;
-    private String eventId;
-    private Map<String, String> properties;
 }
