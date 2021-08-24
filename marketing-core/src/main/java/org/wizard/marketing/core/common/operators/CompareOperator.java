@@ -12,6 +12,7 @@ import java.util.Set;
 public class CompareOperator {
     /**
      * 比较规则中的条件是否匹配
+     * 抽象类比较，简化代码
      */
     public boolean compareUnit(Unit unit1, Unit unit2) {
         if (unit1.getEventId().equals(unit2.getEventId())) {
