@@ -14,6 +14,14 @@ public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, EventBe
 
     @Override
     public void processElement(EventBean eventBean, Context context, Collector<ResultBean> collector) throws Exception {
+        // 获取规则
 
+        // 判断当前事件是否是规则定义的触发事件
+
+        // 计算画像条件是否满足
+
+        // 计算行为次数条件是否满足
+
+        // 计算行为次序条件是否满足
     }
 }
