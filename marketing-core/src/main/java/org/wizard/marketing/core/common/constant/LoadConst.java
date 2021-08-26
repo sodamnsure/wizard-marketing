@@ -8,4 +8,5 @@ package org.wizard.marketing.core.common.constant;
 public class LoadConst {
     public static final String KAFKA_BOOTSTRAP_SERVERS = "kafka.bootstrap.servers";
     public static final String KAFKA_AUTO_OFFSET_RESET = "kafka.auto.offset.reset";
+    public static final String HBASE_ZK_QUORUM = "hbase.zookeeper.quorum";
 }

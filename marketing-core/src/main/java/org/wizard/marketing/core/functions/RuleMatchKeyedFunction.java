@@ -1,5 +1,6 @@
 package org.wizard.marketing.core.functions;
 
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 import org.wizard.marketing.core.beans.EventBean;
@@ -11,6 +12,13 @@ import org.wizard.marketing.core.beans.ResultBean;
  * @Desc:
  */
 public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, EventBean, ResultBean> {
+
+    @Override
+    public void open(Configuration parameters) throws Exception {
+        // 获取一个hbase的链接
+
+
+    }
 
     @Override
     public void processElement(EventBean eventBean, Context context, Collector<ResultBean> collector) throws Exception {
