@@ -13,17 +13,20 @@ import java.io.IOException;
 /**
  * @Author: sodamnsure
  * @Date: 2021/8/26 7:57 下午
- * @Desc: 客户端链接创建工具
+ * @Desc: 客户端连接创建工具
  */
 public class ConnectionUtils {
     static Config config = ConfigFactory.load();
 
-    public Connection getHbaseConnection() throws IOException {
+    public static Connection getHbaseConnection() throws IOException {
+        System.out.println("创建HBASE连接被调用...........");
         // 创建HBASE配置
         Configuration conf = HBaseConfiguration.create();
         conf.set("hbase.zookeeper.quorum", config.getString(LoadConst.HBASE_ZK_QUORUM));
-        // 创建HBASE链接
-        return ConnectionFactory.createConnection(conf);
+        // 创建HBASE连接
+        Connection connection = ConnectionFactory.createConnection(conf);
+        System.out.println("创建HBASE连接成功...........");
+        return connection;
     }
 
 }
