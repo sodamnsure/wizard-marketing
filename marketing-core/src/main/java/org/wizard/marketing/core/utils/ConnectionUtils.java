@@ -2,6 +2,7 @@ package org.wizard.marketing.core.utils;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Connection;
@@ -15,6 +16,7 @@ import java.io.IOException;
  * @Date: 2021/8/26 7:57 下午
  * @Desc: 客户端连接创建工具
  */
+@Slf4j
 public class ConnectionUtils {
     static Config config = ConfigFactory.load();
 

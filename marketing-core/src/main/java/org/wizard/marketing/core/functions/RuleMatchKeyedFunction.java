@@ -38,11 +38,11 @@ public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, EventBe
         RuleBean rule = new RuleBean();
 
         /*
-          判断当前事件是否是规则定义的触发事件
+         * 判断当前事件是否是规则定义的触发事件
          */
 
         /*
-          计算画像条件是否满足
+         * 计算画像条件是否满足
          */
         Map<String, String> userProfileConditions = rule.getUserProfileConditions();
         if (userProfileConditions != null) {
@@ -64,8 +64,12 @@ public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, EventBe
 
         }
 
-        // 计算行为次数条件是否满足
+        /*
+         * 计算行为次数条件是否满足
+         */
 
-        // 计算行为次序条件是否满足
+        /*
+         * 计算行为次序条件是否满足
+         */
     }
 }
