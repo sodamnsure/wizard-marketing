@@ -14,7 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ResultBean {
+public class Result {
     private String deviceId;
     private String ruleId;
     private Long triggerTime;

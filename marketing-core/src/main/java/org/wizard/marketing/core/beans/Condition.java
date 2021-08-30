@@ -11,7 +11,7 @@ import org.wizard.marketing.core.beans.basic.Unit;
  */
 @Getter
 @Setter
-public class ConditionBean extends Unit {
+public class Condition extends Unit {
     private Integer threshold;
     private Long startTime;
     private Long endTime;

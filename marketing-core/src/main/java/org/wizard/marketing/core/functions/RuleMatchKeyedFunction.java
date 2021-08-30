@@ -6,11 +6,10 @@ import org.apache.flink.util.Collector;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Table;
-import org.wizard.marketing.core.beans.EventBean;
-import org.wizard.marketing.core.beans.ResultBean;
-import org.wizard.marketing.core.beans.RuleBean;
+import org.wizard.marketing.core.beans.Event;
+import org.wizard.marketing.core.beans.Result;
+import org.wizard.marketing.core.beans.Rule;
 import org.wizard.marketing.core.utils.ConnectionUtils;
 
 import java.util.Map;
@@ -21,7 +20,7 @@ import java.util.Set;
  * @Date: 2021/8/19 7:14 下午
  * @Desc:
  */
-public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, EventBean, ResultBean> {
+public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, Event, Result> {
     Connection hbaseConn;
 
     @Override
@@ -33,9 +32,9 @@ public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, EventBe
     }
 
     @Override
-    public void processElement(EventBean event, Context context, Collector<ResultBean> collector) throws Exception {
+    public void processElement(Event event, Context context, Collector<Result> collector) throws Exception {
         // 获取规则
-        RuleBean rule = new RuleBean();
+        Rule rule = new Rule();
 
         /*
          * 判断当前事件是否是规则定义的触发事件
@@ -54,7 +53,7 @@ public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, EventBe
                 get.addColumn("f".getBytes(), tag.getBytes());
             }
 
-            Result result = table.get(get);
+            org.apache.hadoop.hbase.client.Result result = table.get(get);
 
             for (String tag : tags) {
                 byte[] value = result.getValue("f".getBytes(), tag.getBytes());

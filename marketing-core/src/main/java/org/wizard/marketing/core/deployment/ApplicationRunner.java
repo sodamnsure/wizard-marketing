@@ -5,7 +5,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.wizard.marketing.core.beans.EventBean;
+import org.wizard.marketing.core.beans.Event;
 import org.wizard.marketing.core.functions.JsonToBeanMapFunction;
 import org.wizard.marketing.core.sources.KafkaSourceBuilder;
 
@@ -23,9 +23,9 @@ public class ApplicationRunner {
         KafkaSourceBuilder kafkaSourceBuilder = new KafkaSourceBuilder();
         DataStream<String> stream = env.addSource(kafkaSourceBuilder.build("ActionLog"));
 
-        DataStream<EventBean> streamWithBean = stream.map(new JsonToBeanMapFunction()).filter(Objects::nonNull);
+        DataStream<Event> streamWithBean = stream.map(new JsonToBeanMapFunction()).filter(Objects::nonNull);
 
-        KeyedStream<EventBean, String> keyedStream = streamWithBean.keyBy(EventBean::getDeviceId);
+        KeyedStream<Event, String> keyedStream = streamWithBean.keyBy(Event::getDeviceId);
 
 
 
