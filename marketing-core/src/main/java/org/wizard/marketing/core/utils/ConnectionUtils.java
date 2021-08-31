@@ -21,13 +21,13 @@ public class ConnectionUtils {
     static Config config = ConfigFactory.load();
 
     public static Connection getHbaseConnection() throws IOException {
-        System.out.println("创建HBASE连接被调用...........");
+        log.debug("创建HBASE连接被调用...........");
         // 创建HBASE配置
         Configuration conf = HBaseConfiguration.create();
         conf.set("hbase.zookeeper.quorum", config.getString(LoadConst.HBASE_ZK_QUORUM));
         // 创建HBASE连接
         Connection connection = ConnectionFactory.createConnection(conf);
-        System.out.println("创建HBASE连接成功...........");
+        log.debug("创建HBASE连接成功...........");
         return connection;
     }
 
