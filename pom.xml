@@ -16,8 +16,8 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <commons.lang3.version>3.8.1</commons.lang3.version>
-        <kafka.clients.version>2.7.0</kafka.clients.version>
-        <hbase.client.version>2.0.6</hbase.client.version>
+        <kafka.version>2.7.0</kafka.version>
+        <hbase.version>2.0.6</hbase.version>
         <flink.version>1.12.0</flink.version>
         <mysql.version>8.0.20</mysql.version>
         <redis.version>3.6.1</redis.version>
@@ -59,12 +59,12 @@
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
-                <version>${kafka.clients.version}</version>
+                <version>${kafka.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-client</artifactId>
-                <version>${hbase.client.version}</version>
+                <version>${hbase.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
@@ -75,7 +75,7 @@
             <dependency>
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-common</artifactId>
-                <version>${hbase.client.version}</version>
+                <version>${hbase.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>

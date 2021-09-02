@@ -3,10 +3,13 @@ package org.wizard.marketing.core.deployment;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.wizard.marketing.core.beans.Event;
+import org.wizard.marketing.core.beans.Result;
 import org.wizard.marketing.core.functions.JsonToBeanMapFunction;
+import org.wizard.marketing.core.functions.RuleMatchKeyedFunction;
 import org.wizard.marketing.core.sources.KafkaSourceBuilder;
 
 import java.util.Objects;
@@ -27,7 +30,9 @@ public class ApplicationRunner {
 
         KeyedStream<Event, String> keyedStream = streamWithBean.keyBy(Event::getDeviceId);
 
+        SingleOutputStreamOperator<Result> process = keyedStream.process(new RuleMatchKeyedFunction());
 
+        process.print();
 
         env.execute();
     }
