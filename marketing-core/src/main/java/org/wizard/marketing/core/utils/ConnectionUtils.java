@@ -21,7 +21,7 @@ public class ConnectionUtils {
     static Config config = ConfigFactory.load();
 
     public static Connection getHbaseConnection() throws IOException {
-        log.debug("创建HBASE连接被调用...........");
+        log.debug("HBASE连接准备创建...........");
         // 创建HBASE配置
         Configuration conf = HBaseConfiguration.create();
         conf.set("hbase.zookeeper.quorum", config.getString(LoadConst.HBASE_ZK_QUORUM));

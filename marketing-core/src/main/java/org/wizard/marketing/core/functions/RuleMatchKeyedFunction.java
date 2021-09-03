@@ -13,6 +13,7 @@ import org.wizard.marketing.core.beans.Result;
 import org.wizard.marketing.core.beans.Rule;
 import org.wizard.marketing.core.common.operators.CompareOperator;
 import org.wizard.marketing.core.utils.ConnectionUtils;
+import org.wizard.marketing.core.utils.RuleMonitor;
 
 import java.util.Map;
 import java.util.Set;
@@ -37,11 +38,12 @@ public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, Event, 
     @Override
     public void processElement(Event event, Context context, Collector<Result> collector) throws Exception {
         // 获取规则
-        Rule rule = new Rule();
+        Rule rule = RuleMonitor.getRule();
 
         /*
          * 判断当前事件是否是规则定义的触发事件
          */
+        log.debug("判断当前事件是否是规则定义的触发事件......");
         if (!CompareOperator.compareUnit(rule.getTriggerEvent(), event)) return;
         log.debug("规则被触发...........");
 
