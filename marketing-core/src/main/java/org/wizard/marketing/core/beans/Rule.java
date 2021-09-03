@@ -14,11 +14,14 @@ import java.util.Map;
 @Getter
 @Setter
 public class Rule {
+    // 规则ID
+    private String ruleId;
+
     // 触发条件
     private Condition triggerEvent;
 
     // 画像属性条件
-    private Map<String, String> userProfileConditions;
+    private Map<String, String> profileConditions;
 
     // 行为次数条件
     private List<Condition> actionCountConditions;

@@ -16,6 +16,8 @@ public class RuleMonitor {
         // 创建规则
         Rule rule = new Rule();
 
+        rule.setRuleId("test_rule1");
+
         // 触发条件
         Condition trigger = new Condition();
         HashMap<String, String> triggerProp = new HashMap<>();
@@ -29,7 +31,7 @@ public class RuleMonitor {
         HashMap<String, String> userProfile = new HashMap<>();
         userProfile.put("k1", "v2");
         userProfile.put("k2", "v2");
-        rule.setUserProfileConditions(userProfile);
+        rule.setProfileConditions(userProfile);
 
         // 行为次数条件
         Condition actionCount = new Condition();

@@ -4,19 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
-import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Table;
 import org.wizard.marketing.core.beans.Event;
 import org.wizard.marketing.core.beans.Result;
 import org.wizard.marketing.core.beans.Rule;
 import org.wizard.marketing.core.common.operators.CompareOperator;
+import org.wizard.marketing.core.service.query.HbaseQueryServiceImpl;
 import org.wizard.marketing.core.utils.ConnectionUtils;
 import org.wizard.marketing.core.utils.RuleMonitor;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @Author: sodamnsure
@@ -26,18 +23,21 @@ import java.util.Set;
 @Slf4j
 public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, Event, Result> {
     Connection hbaseConn;
+    HbaseQueryServiceImpl hbaseQueryService;
 
     @Override
     public void open(Configuration parameters) throws Exception {
         // 获取一个hbase的连接
         hbaseConn = ConnectionUtils.getHbaseConnection();
-
-
+        // 获取画像查询服务
+        hbaseQueryService = new HbaseQueryServiceImpl(hbaseConn);
     }
 
     @Override
     public void processElement(Event event, Context context, Collector<Result> collector) throws Exception {
-        // 获取规则
+        /*
+         * 获取规则
+         */
         Rule rule = RuleMonitor.getRule();
 
         /*
@@ -50,24 +50,14 @@ public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, Event, 
         /*
          * 计算画像条件是否满足
          */
-        Map<String, String> userProfileConditions = rule.getUserProfileConditions();
-        if (userProfileConditions != null) {
-            Set<String> tags = userProfileConditions.keySet();
-
-            Table table = hbaseConn.getTable(TableName.valueOf("user_profile"));
-            Get get = new Get(event.getDeviceId().getBytes());
-            for (String tag : tags) {
-                get.addColumn("f".getBytes(), tag.getBytes());
+        Map<String, String> profileConditions = rule.getProfileConditions();
+        if (profileConditions != null) {
+            boolean profileQueryResult = hbaseQueryService.queryProfileCondition(event.getDeviceId(), profileConditions);
+            // 如果画像属性条件查询结果为false,则整个规则计算结束
+            if (!profileQueryResult) {
+                log.debug("画像属性条件查询结果为false,该用户: [" + event.getDeviceId() + "] 规则计算结束");
+                return;
             }
-
-            org.apache.hadoop.hbase.client.Result result = table.get(get);
-
-            for (String tag : tags) {
-                byte[] value = result.getValue("f".getBytes(), tag.getBytes());
-                System.out.println("查询到一个标签: " + tag + " = " + new String(value));
-                if (!userProfileConditions.get(tag).equals(new String(value))) return;
-            }
-
         }
 
         /*
