@@ -26,7 +26,7 @@ public class CompareOperator {
                 String value = unit2.getProperties().get(key);
                 if (!unit1.getProperties().get(key).equals(value)) {
                     log.debug("规则触发事件中属性要求为{" + key + ": " + unit1.getProperties().get(key) + "}"
-                            + "但是真实事件中的属性为{" + key + ": " + value + "}");
+                            + " 真实事件中的属性为{" + key + ": " + value + "}");
                     return false;
                 }
             }
