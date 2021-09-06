@@ -29,8 +29,13 @@ public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, Event, 
     public void open(Configuration parameters) throws Exception {
         // 获取一个hbase的连接
         hbaseConn = ConnectionUtils.getHbaseConnection();
-        // 获取画像查询服务
+        // 获取一个clickhouse的jdbc连接
+
+
+        // 构造一个hbase的查询服务
         hbaseQueryService = new HbaseQueryServiceImpl(hbaseConn);
+        // 构造一个clickhouse的查询服务
+
     }
 
     @Override
@@ -55,7 +60,7 @@ public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, Event, 
             boolean profileQueryResult = hbaseQueryService.queryProfileCondition(event.getDeviceId(), profileConditions);
             // 如果画像属性条件查询结果为false,则整个规则计算结束
             if (!profileQueryResult) {
-                log.debug("画像属性条件查询结果为false,该用户: [" + event.getDeviceId() + "] 规则计算结束");
+                log.debug("画像属性条件查询结果为false,该用户: [{}] 规则计算结束", event.getDeviceId());
                 return;
             }
         }
