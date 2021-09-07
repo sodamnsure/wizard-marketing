@@ -10,6 +10,7 @@ import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.wizard.marketing.core.common.constant.LoadConst;
 
 import java.io.IOException;
+import java.sql.DriverManager;
 
 /**
  * @Author: sodamnsure
@@ -20,6 +21,11 @@ import java.io.IOException;
 public class ConnectionUtils {
     static Config config = ConfigFactory.load();
 
+    /**
+     * 获取HBASE连接
+     *
+     * @return 返回HBASE连接
+     */
     public static Connection getHbaseConnection() throws IOException {
         log.debug("HBASE连接准备创建...........");
         // 创建HBASE配置
@@ -31,4 +37,19 @@ public class ConnectionUtils {
         return connection;
     }
 
+    /**
+     * 获取ClickHouse连接
+     *
+     * @return 返回ClickHouse连接
+     */
+    public static java.sql.Connection getClickHouseConnection() throws Exception {
+        log.debug("ClickHouse连接准备创建...........");
+        String ckDriver = config.getString(LoadConst.CK_JDBC_DRIVER);
+        String ckUrl = config.getString(LoadConst.CK_JDBC_URL);
+
+        Class.forName(ckDriver);
+        java.sql.Connection conn = DriverManager.getConnection(ckUrl);
+        log.debug("创建ClickHouse连接成功...........");
+        return conn;
+    }
 }

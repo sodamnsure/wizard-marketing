@@ -22,6 +22,7 @@ import java.util.Objects;
 public class ApplicationRunner {
     public static void main(String[] args) throws Exception {
         LocalStreamEnvironment env = StreamExecutionEnvironment.createLocalEnvironment(new Configuration());
+        env.setParallelism(1);
 
         KafkaSourceBuilder kafkaSourceBuilder = new KafkaSourceBuilder();
         DataStream<String> stream = env.addSource(kafkaSourceBuilder.build("ActionLog"));

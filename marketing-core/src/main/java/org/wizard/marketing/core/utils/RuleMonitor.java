@@ -43,7 +43,10 @@ public class RuleMonitor {
         actionCount.setThreshold(2);
         actionCount.setStartTime(1630652600000L);
         actionCount.setEndTime(Long.MAX_VALUE);
+
+
         rule.setActionCountConditions(Collections.singletonList(actionCount));
+
 
         return rule;
     }

@@ -15,4 +15,5 @@ public class Condition extends Unit {
     private Integer threshold;
     private Long startTime;
     private Long endTime;
+    private String querySql;
 }

@@ -2,7 +2,6 @@ package org.wizard.marketing.core.service.query;
 
 import lombok.extern.slf4j.Slf4j;
 import org.wizard.marketing.core.beans.Condition;
-import org.wizard.marketing.core.beans.Event;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,11 +14,11 @@ import java.sql.SQLException;
  * @Desc:
  */
 @Slf4j
-public class ClickHouseQueryServiceImpl implements QueryService {
+public class CKQueryServiceImpl implements QueryService {
 
     Connection ckConn;
 
-    public ClickHouseQueryServiceImpl(Connection conn) {
+    public CKQueryServiceImpl(Connection conn) {
         this.ckConn = conn;
     }
 
@@ -45,7 +44,7 @@ public class ClickHouseQueryServiceImpl implements QueryService {
             result = resultSet.getLong("cnt");
         }
 
-        return 1;
+        return (int)result;
 
     }
 }
