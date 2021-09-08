@@ -17,8 +17,6 @@ public class CompareOperator {
      * 抽象类比较，简化代码
      */
     public static boolean compareUnit(Unit unit1, Unit unit2) {
-        log.debug("规则触发事件ID: [{}] 当前真实事件ID: [{}]", unit1.getEventId(), unit2.getEventId());
-
         if (unit1.getEventId().equals(unit2.getEventId())) {
             log.debug("规则触发事件ID: [{}] 当前真实事件ID: [{}] 相等, 准备比较属性.....", unit1.getEventId(), unit2.getEventId());
             Set<String> keys = unit1.getProperties().keySet();

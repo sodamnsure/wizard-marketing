@@ -30,20 +30,32 @@ public class RuleMonitor {
         // 画像属性条件
         HashMap<String, String> userProfile = new HashMap<>();
         userProfile.put("k1", "v2");
-        userProfile.put("k2", "v2");
         rule.setProfileConditions(userProfile);
 
         // 行为次数条件
         Condition actionCount = new Condition();
-        actionCount.setEventId("U");
+        actionCount.setEventId("S");
         HashMap<String, String> actionProp = new HashMap<>();
-        actionProp.put("k2", "v2");
-        actionProp.put("k3", "v2");
+        actionProp.put("p1", "v6");
+        actionProp.put("p7", "v1");
         actionCount.setProperties(actionProp);
-        actionCount.setThreshold(2);
-        actionCount.setStartTime(1630652600000L);
-        actionCount.setEndTime(Long.MAX_VALUE);
+        actionCount.setThreshold(1);
+        Long startTime = 1630652600000L;
+        actionCount.setStartTime(startTime);
+        Long endTime = Long.MAX_VALUE;
+        actionCount.setEndTime(endTime);
 
+        String sql = "" +
+                "select " +
+                "count(*) as cnt\n" +
+                "from default.event_detail\n" +
+                "where eventId = 'S'\n" +
+                "  and properties['p1'] = 'v6'\n" +
+                "  and properties['p7'] = 'v1'\n" +
+                "  and deviceId = ?\n" +
+                "  and timeStamp between " + startTime + " and " + endTime;
+
+        actionCount.setQuerySql(sql);
 
         rule.setActionCountConditions(Collections.singletonList(actionCount));
 

@@ -24,19 +24,9 @@ public class CKQueryServiceImpl implements QueryService {
 
     public int queryActionCountCondition(String deviceId, Condition condition) throws SQLException {
         log.debug("收到一个clickhouse查询请求，参数为: deviceId = [{}], condition = [{}]", deviceId, condition);
-        String sql = "" +
-                "select " +
-                "count(*) as cnt\n" +
-                "from default.event_detail\n" +
-                "where eventId = 'S'\n" +
-                "  and properties['p1'] = 'v6'\n" +
-                "  and properties['p7'] = 'v1'\n" +
-                "  and deviceId = ?\n" +
-                "  and timeStamp between ? and ?";
-        PreparedStatement pst = ckConn.prepareStatement(sql);
+
+        PreparedStatement pst = ckConn.prepareStatement(condition.getQuerySql());
         pst.setString(1, deviceId);
-        pst.setLong(2, condition.getStartTime());
-        pst.setLong(3, condition.getEndTime());
 
         long result = 0;
         ResultSet resultSet = pst.executeQuery();

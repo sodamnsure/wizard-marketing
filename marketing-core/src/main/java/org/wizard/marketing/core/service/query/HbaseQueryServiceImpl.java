@@ -1,5 +1,6 @@
 package org.wizard.marketing.core.service.query;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
@@ -15,6 +16,7 @@ import java.util.Set;
  * @Date: 2021/9/3 4:22 下午
  * @Desc:
  */
+@Slf4j
 public class HbaseQueryServiceImpl implements QueryService {
     Connection hbaseConn;
 
@@ -35,7 +37,7 @@ public class HbaseQueryServiceImpl implements QueryService {
 
         for (String tag : tags) {
             byte[] value = result.getValue("f".getBytes(), tag.getBytes());
-            System.out.println("查询到一个标签: " + tag + " = " + new String(value));
+            log.info("规则画像属性条件标签: [{}: {}], 查询到的标签为: [{}: {}]}", tag, profileConditions.get(tag), tag, new String(value));
             if (!profileConditions.get(tag).equals(new String(value))) return false;
         }
         return true;
