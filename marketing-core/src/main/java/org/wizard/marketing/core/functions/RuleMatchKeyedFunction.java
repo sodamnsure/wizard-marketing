@@ -73,12 +73,12 @@ public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, Event, 
         }
 
         /*
-         * 计算行为次数条件是否满足
+         * 计算次数条件是否满足
          */
-        List<Condition> actionCountConditions = rule.getActionCountConditions();
-        if (actionCountConditions != null && actionCountConditions.size() > 0) {
+        List<Condition> countConditions = rule.getCountConditions();
+        if (countConditions != null && countConditions.size() > 0) {
             log.debug("行为次数条件不为空，开始查询.......");
-            for (Condition condition : actionCountConditions) {
+            for (Condition condition : countConditions) {
                 int count = CKQueryService.queryActionCountCondition(event.getDeviceId(), condition);
                 // 如果查询到一个行为次数条件不满足，则整个规则计算结束
                 log.debug("规则条件为: [{}], 查询到的结果为: [{}]", condition.getThreshold(), count);
@@ -87,7 +87,7 @@ public class RuleMatchKeyedFunction extends KeyedProcessFunction<String, Event, 
         }
 
         /*
-         * 计算行为次序条件是否满足
+         * 计算序列条件是否满足
          */
     }
 }

@@ -57,7 +57,27 @@ public class RuleMonitor {
 
         actionCount.setQuerySql(sql);
 
-        rule.setActionCountConditions(Collections.singletonList(actionCount));
+        rule.setCountConditions(Collections.singletonList(actionCount));
+
+        // 行为序列条件
+        Condition seq1 = new Condition();
+        HashMap<String, String> seqProp1 = new HashMap<>();
+        seqProp1.put("p3", "v3");
+        seq1.setEventId("A");
+        seq1.setProperties(seqProp1);
+
+        Condition seq2 = new Condition();
+        HashMap<String, String> seqProp2 = new HashMap<>();
+        seqProp2.put("p1", "v1");
+        seq2.setEventId("C");
+        seq2.setProperties(seqProp2);
+
+        Condition seq3 = new Condition();
+        HashMap<String, String> seqProp3 = new HashMap<>();
+        seqProp3.put("p5", "v1");
+        seq3.setEventId("F");
+        seq3.setProperties(seqProp3);
+
 
 
         return rule;

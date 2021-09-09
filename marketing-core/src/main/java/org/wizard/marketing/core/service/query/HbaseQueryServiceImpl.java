@@ -37,7 +37,7 @@ public class HbaseQueryServiceImpl implements QueryService {
 
         for (String tag : tags) {
             byte[] value = result.getValue("f".getBytes(), tag.getBytes());
-            log.info("规则画像属性条件标签: [{}: {}], 查询到的标签为: [{}: {}]}", tag, profileConditions.get(tag), tag, new String(value));
+            log.info("规则画像条件标签: [{}: {}], 查询到的标签为: [{}: {}]}", tag, profileConditions.get(tag), tag, new String(value));
             if (!profileConditions.get(tag).equals(new String(value))) return false;
         }
         return true;
