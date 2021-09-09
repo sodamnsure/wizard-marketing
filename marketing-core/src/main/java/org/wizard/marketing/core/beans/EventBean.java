@@ -11,7 +11,7 @@ import org.wizard.marketing.core.beans.basic.Unit;
  */
 @Getter
 @Setter
-public class Event extends Unit {
+public class EventBean extends Unit {
     private String account;
     private String appId;
     private String appVersion;

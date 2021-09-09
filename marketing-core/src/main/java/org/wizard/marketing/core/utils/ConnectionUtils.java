@@ -7,7 +7,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
-import org.wizard.marketing.core.common.constant.LoadConst;
+import org.wizard.marketing.core.common.constant.LoadConstant;
 
 import java.io.IOException;
 import java.sql.DriverManager;
@@ -30,7 +30,7 @@ public class ConnectionUtils {
         log.debug("HBASE连接准备创建...........");
         // 创建HBASE配置
         Configuration conf = HBaseConfiguration.create();
-        conf.set("hbase.zookeeper.quorum", config.getString(LoadConst.HBASE_ZK_QUORUM));
+        conf.set("hbase.zookeeper.quorum", config.getString(LoadConstant.HBASE_ZK_QUORUM));
         // 创建HBASE连接
         Connection connection = ConnectionFactory.createConnection(conf);
         log.debug("创建HBASE连接成功...........");
@@ -44,8 +44,8 @@ public class ConnectionUtils {
      */
     public static java.sql.Connection getClickHouseConnection() throws Exception {
         log.debug("ClickHouse连接准备创建...........");
-        String ckDriver = config.getString(LoadConst.CK_JDBC_DRIVER);
-        String ckUrl = config.getString(LoadConst.CK_JDBC_URL);
+        String ckDriver = config.getString(LoadConstant.CK_JDBC_DRIVER);
+        String ckUrl = config.getString(LoadConstant.CK_JDBC_URL);
 
         Class.forName(ckDriver);
         java.sql.Connection conn = DriverManager.getConnection(ckUrl);

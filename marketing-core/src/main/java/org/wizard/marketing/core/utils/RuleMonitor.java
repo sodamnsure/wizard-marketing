@@ -1,7 +1,7 @@
 package org.wizard.marketing.core.utils;
 
-import org.wizard.marketing.core.beans.Condition;
-import org.wizard.marketing.core.beans.Rule;
+import org.wizard.marketing.core.beans.ConditionBean;
+import org.wizard.marketing.core.beans.RuleBean;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,14 +12,14 @@ import java.util.HashMap;
  * @Desc: 规则模拟器
  */
 public class RuleMonitor {
-    public static Rule getRule() {
+    public static RuleBean getRule() {
         // 创建规则
-        Rule rule = new Rule();
+        RuleBean rule = new RuleBean();
 
         rule.setRuleId("test_rule1");
 
         // 触发条件
-        Condition trigger = new Condition();
+        ConditionBean trigger = new ConditionBean();
         HashMap<String, String> triggerProp = new HashMap<>();
         triggerProp.put("p1", "v1");
         trigger.setEventId("K");
@@ -33,7 +33,7 @@ public class RuleMonitor {
         rule.setProfileConditions(userProfile);
 
         // 行为次数条件
-        Condition actionCount = new Condition();
+        ConditionBean actionCount = new ConditionBean();
         actionCount.setEventId("S");
         HashMap<String, String> actionProp = new HashMap<>();
         actionProp.put("p1", "v6");
@@ -60,19 +60,19 @@ public class RuleMonitor {
         rule.setCountConditions(Collections.singletonList(actionCount));
 
         // 行为序列条件
-        Condition seq1 = new Condition();
+        ConditionBean seq1 = new ConditionBean();
         HashMap<String, String> seqProp1 = new HashMap<>();
         seqProp1.put("p3", "v3");
         seq1.setEventId("A");
         seq1.setProperties(seqProp1);
 
-        Condition seq2 = new Condition();
+        ConditionBean seq2 = new ConditionBean();
         HashMap<String, String> seqProp2 = new HashMap<>();
         seqProp2.put("p1", "v1");
         seq2.setEventId("C");
         seq2.setProperties(seqProp2);
 
-        Condition seq3 = new Condition();
+        ConditionBean seq3 = new ConditionBean();
         HashMap<String, String> seqProp3 = new HashMap<>();
         seqProp3.put("p5", "v1");
         seq3.setEventId("F");

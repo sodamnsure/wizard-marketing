@@ -4,7 +4,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import org.wizard.marketing.core.common.constant.LoadConst;
+import org.wizard.marketing.core.common.constant.LoadConstant;
 
 import java.util.Properties;
 
@@ -22,8 +22,8 @@ public class KafkaSourceBuilder {
 
     public FlinkKafkaConsumer<String> build(String topic) {
         Properties props = new Properties();
-        props.setProperty("bootstrap.servers", config.getString(LoadConst.KAFKA_BOOTSTRAP_SERVERS));
-        props.setProperty("auto.offset.reset", config.getString(LoadConst.KAFKA_AUTO_OFFSET_RESET));
+        props.setProperty("bootstrap.servers", config.getString(LoadConstant.KAFKA_BOOTSTRAP_SERVERS));
+        props.setProperty("auto.offset.reset", config.getString(LoadConstant.KAFKA_AUTO_OFFSET_RESET));
 
         return new FlinkKafkaConsumer<>(topic, new SimpleStringSchema(), props);
     }

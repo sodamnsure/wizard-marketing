@@ -6,10 +6,10 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.wizard.marketing.core.beans.Event;
-import org.wizard.marketing.core.beans.Result;
-import org.wizard.marketing.core.functions.JsonToBeanMapFunction;
-import org.wizard.marketing.core.functions.RuleMatchKeyedFunction;
+import org.wizard.marketing.core.beans.EventBean;
+import org.wizard.marketing.core.beans.ResultBean;
+import org.wizard.marketing.core.functions.JsonToBeanFunction;
+import org.wizard.marketing.core.functions.MatchRuleFunction;
 import org.wizard.marketing.core.sources.KafkaSourceBuilder;
 
 import java.util.Objects;
@@ -27,11 +27,11 @@ public class ApplicationRunner {
         KafkaSourceBuilder kafkaSourceBuilder = new KafkaSourceBuilder();
         DataStream<String> stream = env.addSource(kafkaSourceBuilder.build("ActionLog"));
 
-        DataStream<Event> streamWithBean = stream.map(new JsonToBeanMapFunction()).filter(Objects::nonNull);
+        DataStream<EventBean> streamWithBean = stream.map(new JsonToBeanFunction()).filter(Objects::nonNull);
 
-        KeyedStream<Event, String> keyedStream = streamWithBean.keyBy(Event::getDeviceId);
+        KeyedStream<EventBean, String> keyedStream = streamWithBean.keyBy(EventBean::getDeviceId);
 
-        SingleOutputStreamOperator<Result> process = keyedStream.process(new RuleMatchKeyedFunction());
+        SingleOutputStreamOperator<ResultBean> process = keyedStream.process(new MatchRuleFunction());
 
         process.print();
 

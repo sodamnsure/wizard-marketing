@@ -13,19 +13,19 @@ import java.util.Map;
  */
 @Getter
 @Setter
-public class Rule {
+public class RuleBean {
     // 规则ID
     private String ruleId;
 
     // 触发条件
-    private Condition triggerEvent;
+    private ConditionBean triggerEvent;
 
     // 画像条件
     private Map<String, String> profileConditions;
 
     // 次数条件
-    private List<Condition> countConditions;
+    private List<ConditionBean> countConditions;
 
     // 序列条件
-    private List<Condition> sequenceConditions;
+    private List<ConditionBean> sequenceConditions;
 }

@@ -1,7 +1,7 @@
 package org.wizard.marketing.core.service.query;
 
 import lombok.extern.slf4j.Slf4j;
-import org.wizard.marketing.core.beans.Condition;
+import org.wizard.marketing.core.beans.ConditionBean;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,15 +14,15 @@ import java.sql.SQLException;
  * @Desc:
  */
 @Slf4j
-public class CKQueryServiceImpl implements QueryService {
+public class ClickQueryServiceImpl implements QueryService {
 
     Connection ckConn;
 
-    public CKQueryServiceImpl(Connection conn) {
+    public ClickQueryServiceImpl(Connection conn) {
         this.ckConn = conn;
     }
 
-    public int queryActionCountCondition(String deviceId, Condition condition) throws SQLException {
+    public int queryActionCountCondition(String deviceId, ConditionBean condition) throws SQLException {
         log.debug("收到一个clickhouse查询请求，参数为: deviceId = [{}], condition = [{}]", deviceId, condition);
 
         PreparedStatement pst = ckConn.prepareStatement(condition.getQuerySql());
