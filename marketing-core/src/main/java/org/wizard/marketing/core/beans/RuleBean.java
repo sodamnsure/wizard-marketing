@@ -27,5 +27,5 @@ public class RuleBean {
     private List<ConditionBean> countConditions;
 
     // 序列条件
-    private List<ConditionBean> sequenceConditions;
+    private List<SequenceConditionBean> sequenceConditions;
 }

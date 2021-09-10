@@ -16,7 +16,7 @@ import java.util.List;
  * @Date: 2021/8/19 10:12 上午
  * @Desc: Json工具类
  */
-public class ParseJsonUtils {
+public class JsonParseUtils {
     // 定义jackson对象，用于 Java 对象的序列化及反序列化
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

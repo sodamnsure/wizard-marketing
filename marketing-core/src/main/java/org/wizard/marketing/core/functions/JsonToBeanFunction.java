@@ -2,7 +2,7 @@ package org.wizard.marketing.core.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.wizard.marketing.core.beans.EventBean;
-import org.wizard.marketing.core.utils.ParseJsonUtils;
+import org.wizard.marketing.core.utils.JsonParseUtils;
 
 /**
  * @Author: sodamnsure
@@ -12,6 +12,6 @@ import org.wizard.marketing.core.utils.ParseJsonUtils;
 public class JsonToBeanFunction implements MapFunction<String, EventBean> {
     @Override
     public EventBean map(String json) {
-        return ParseJsonUtils.parseObject(json, EventBean.class);
+        return JsonParseUtils.parseObject(json, EventBean.class);
     }
 }
