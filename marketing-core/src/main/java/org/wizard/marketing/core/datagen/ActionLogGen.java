@@ -2,6 +2,7 @@ package org.wizard.marketing.core.datagen;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,8 +18,10 @@ import java.util.Properties;
  * @Date: 2021/9/9 3:19 下午
  * @Desc:
  */
+@Slf4j
 public class ActionLogGen {
     public static void main(String[] args) {
+        log.info("开始生产数据");
         // 创建多线程，并行执行，创建Runnable匿名内部类
         for (int i = 0; i < 10; i++) {
             new Thread(new Runnable() {
