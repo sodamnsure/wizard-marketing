@@ -27,7 +27,7 @@ public class ClickHouseQueryServiceImpl implements QueryService {
      * 次数条件查询方法
      */
     public int queryCountCondition(String deviceId, ConditionBean condition) throws SQLException {
-        log.debug("收到一个clickhouse查询请求，参数为: deviceId = [{}], condition = [{}]", deviceId, condition.getQuerySql());
+        log.debug("收到一个clickhouse次数查询请求，参数为: deviceId = [{}], condition = [{}]", deviceId, condition.getQuerySql());
 
         PreparedStatement pst = ckConn.prepareStatement(condition.getQuerySql());
         pst.setString(1, deviceId);
@@ -37,6 +37,7 @@ public class ClickHouseQueryServiceImpl implements QueryService {
         while (resultSet.next()) {
             result = resultSet.getLong("cnt");
         }
+        log.debug("次数查询结果为[{}]", result);
 
         return (int) result;
 
@@ -48,20 +49,23 @@ public class ClickHouseQueryServiceImpl implements QueryService {
     public int querySequenceCondition(String deviceId, SequenceConditionBean sequenceConditionBean) throws SQLException {
         int size = sequenceConditionBean.getConditions().size();
 
+        log.debug("收到一个clickhouse序列查询请求，参数为: deviceId = [{}], condition = [{}]", deviceId, sequenceConditionBean.getSequenceQuerySql());
+
         PreparedStatement pst = ckConn.prepareStatement(sequenceConditionBean.getSequenceQuerySql());
         pst.setString(1, deviceId);
         pst.setLong(2, sequenceConditionBean.getStartTime());
         pst.setLong(3, sequenceConditionBean.getEndTime());
 
         ResultSet resultSet = pst.executeQuery();
-        resultSet.next();
         int maxStep = 0;
         int offset = 1;
-        for (int i = 1; i <= size; i++) {
-            int matchResult = resultSet.getInt(i);
-            if (matchResult == 1) {
-                maxStep = size - (i - offset);
-                break;
+        while (resultSet.next()) {
+            for (int i = 1; i <= size; i++) {
+                int matchResult = resultSet.getInt(i);
+                if (matchResult == 1) {
+                    maxStep = size - (i - offset);
+                    break;
+                }
             }
         }
 

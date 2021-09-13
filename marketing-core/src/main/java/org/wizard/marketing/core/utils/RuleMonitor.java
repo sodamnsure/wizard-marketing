@@ -36,10 +36,10 @@ public class RuleMonitor {
 
         // 行为次数条件
         ConditionBean actionCount = new ConditionBean();
-        actionCount.setEventId("S");
+        actionCount.setEventId("K");
         HashMap<String, String> actionProp = new HashMap<>();
-        actionProp.put("p1", "v6");
-        actionProp.put("p7", "v1");
+        actionProp.put("p1", "v1");
+        //actionProp.put("p7", "v1");
         actionCount.setProperties(actionProp);
         actionCount.setThreshold(1);
         Long startTime = 1530652600000L;
@@ -51,9 +51,8 @@ public class RuleMonitor {
                 "select " +
                 "count(*) as cnt\n" +
                 "from default.event_detail\n" +
-                "where eventId = 'S'\n" +
-                "  and properties['p1'] = 'v6'\n" +
-                "  and properties['p7'] = 'v1'\n" +
+                "where eventId = 'K'\n" +
+                "  and properties['p1'] = 'v1'\n" +
                 "  and deviceId = ?\n" +
                 "  and timeStamp between " + startTime + " and " + endTime;
 
@@ -100,7 +99,7 @@ public class RuleMonitor {
                 "                     eventId = 'A'\n" +
                 "           ) as is_match1\n" +
                 "from default.event_detail\n" +
-                "where deviceId = ?'\n" +
+                "where deviceId = ?\n" +
                 "  and timeStamp between ? and ?\n" +
                 "  and (\n" +
                 "        (eventId = 'Z' and properties['p3'] = 'v8')\n" +
