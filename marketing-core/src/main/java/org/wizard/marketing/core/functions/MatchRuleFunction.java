@@ -1,6 +1,8 @@
 package org.wizard.marketing.core.functions;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.state.ListState;
+import org.apache.flink.api.common.state.ListStateDescriptor;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
@@ -19,14 +21,24 @@ import org.wizard.marketing.core.utils.RuleMonitor;
 public class MatchRuleFunction extends KeyedProcessFunction<String, EventBean, ResultBean> {
 
     SimpleQueryRouter simpleQueryRouter;
+    ListState<EventBean> eventState;
 
     @Override
     public void open(Configuration parameters) throws Exception {
         simpleQueryRouter = new SimpleQueryRouter();
+
+        ListStateDescriptor<EventBean> eventBeansDesc = new ListStateDescriptor<EventBean>("event_beans", EventBean.class);
+        eventState = getRuntimeContext().getListState(eventBeansDesc);
     }
 
     @Override
     public void processElement(EventBean event, Context context, Collector<ResultBean> collector) throws Exception {
+        /*
+         * 将当前收到的event存入flink state中
+         */
+        
+        
+
         /*
          * 获取规则
          */
