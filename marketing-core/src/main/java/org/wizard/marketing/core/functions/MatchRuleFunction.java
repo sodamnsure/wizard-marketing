@@ -27,7 +27,7 @@ public class MatchRuleFunction extends KeyedProcessFunction<String, EventBean, R
     public void open(Configuration parameters) throws Exception {
         simpleQueryRouter = new SimpleQueryRouter();
 
-        ListStateDescriptor<EventBean> eventBeansDesc = new ListStateDescriptor<EventBean>("event_beans", EventBean.class);
+        ListStateDescriptor<EventBean> eventBeansDesc = new ListStateDescriptor<>("event_beans", EventBean.class);
         eventState = getRuntimeContext().getListState(eventBeansDesc);
     }
 
