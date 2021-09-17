@@ -9,6 +9,7 @@ import org.apache.flink.util.Collector;
 import org.wizard.marketing.core.beans.EventBean;
 import org.wizard.marketing.core.beans.ResultBean;
 import org.wizard.marketing.core.beans.RuleBean;
+import org.wizard.marketing.core.common.operators.StateDescOperator;
 import org.wizard.marketing.core.router.SimpleQueryRouter;
 import org.wizard.marketing.core.utils.RuleMonitor;
 
@@ -27,8 +28,7 @@ public class MatchRuleFunction extends KeyedProcessFunction<String, EventBean, R
     public void open(Configuration parameters) throws Exception {
         simpleQueryRouter = new SimpleQueryRouter();
 
-        ListStateDescriptor<EventBean> eventBeansDesc = new ListStateDescriptor<>("event_beans", EventBean.class);
-        eventState = getRuntimeContext().getListState(eventBeansDesc);
+        eventState = getRuntimeContext().getListState(StateDescOperator.getEventBeansDesc());
     }
 
     @Override
@@ -36,7 +36,7 @@ public class MatchRuleFunction extends KeyedProcessFunction<String, EventBean, R
         /*
          * 将当前收到的event存入flink state中
          */
-        
+        eventState.add(event);
         
 
         /*
