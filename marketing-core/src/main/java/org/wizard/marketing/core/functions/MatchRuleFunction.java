@@ -37,13 +37,16 @@ public class MatchRuleFunction extends KeyedProcessFunction<String, EventBean, R
          * 将当前收到的event存入flink state中
          */
         eventState.add(event);
-        
+
 
         /*
          * 获取规则
          */
         RuleBean rule = RuleMonitor.getRule();
 
+        /*
+         * 规则路由
+         */
         boolean isMatch = simpleQueryRouter.ruleMatch(rule, event);
         if (!isMatch) return;
 
