@@ -54,7 +54,7 @@ public class RuleMonitor {
                 "where eventId = 'K'\n" +
                 "  and properties['p1'] = 'v1'\n" +
                 "  and deviceId = ?\n" +
-                "  and timeStamp between " + startTime + " and " + endTime;
+                "  and timeStamp between ? and ?";
 
         actionCount.setQuerySql(sql);
 

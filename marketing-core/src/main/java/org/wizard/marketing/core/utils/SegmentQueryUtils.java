@@ -16,7 +16,7 @@ public class SegmentQueryUtils {
     /**
      * 给定时间向上取整，倒退2小时
      */
-    public Long getSegmentPoint(Long timeStamp) {
+    public static Long getSegmentPoint(Long timeStamp) {
         Date dt = DateUtils.ceiling(new Date(timeStamp - SEG_TIME_OFFSET), Calendar.HOUR);
         return dt.getTime();
     }

@@ -26,11 +26,19 @@ public class ClickHouseQueryServiceImpl implements QueryService {
     /**
      * 次数条件查询方法
      */
-    public int queryCountCondition(String deviceId, ConditionBean condition) throws SQLException {
+    public int queryCountCondition(String deviceId, ConditionBean condition) throws Exception {
         log.debug("收到一个clickhouse次数查询请求，参数为: deviceId = [{}], condition = [{}]", deviceId, condition.getQuerySql());
+        return queryCountCondition(deviceId, condition, condition.getStartTime(), condition.getEndTime());
+    }
 
+    /**
+     * 次数条件查询方法重载方法： 可指定时间范围
+     */
+    public int queryCountCondition(String deviceId, ConditionBean condition, Long startTime, Long endTime) throws Exception {
         PreparedStatement pst = ckConn.prepareStatement(condition.getQuerySql());
         pst.setString(1, deviceId);
+        pst.setLong(2, startTime);
+        pst.setLong(3, endTime);
 
         long result = 0;
         ResultSet resultSet = pst.executeQuery();
@@ -40,7 +48,6 @@ public class ClickHouseQueryServiceImpl implements QueryService {
         log.debug("次数查询结果为[{}]", result);
 
         return (int) result;
-
     }
 
     /**
