@@ -7,7 +7,6 @@ import org.wizard.marketing.core.beans.SequenceConditionBean;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * @Author: sodamnsure
@@ -50,18 +49,23 @@ public class ClickHouseQueryServiceImpl implements QueryService {
         return (int) result;
     }
 
+
+    public int querySequenceCondition(String deviceId, SequenceConditionBean sequenceConditionBean) throws Exception {
+        return querySequenceCondition(deviceId, sequenceConditionBean, sequenceConditionBean.getStartTime(), sequenceConditionBean.getEndTime());
+    }
+
     /**
      * 序列条件查询方法
      */
-    public int querySequenceCondition(String deviceId, SequenceConditionBean sequenceConditionBean) throws SQLException {
+    public int querySequenceCondition(String deviceId, SequenceConditionBean sequenceConditionBean, Long startTime, Long endTime) throws Exception {
         int size = sequenceConditionBean.getConditions().size();
 
         log.debug("收到一个clickhouse序列查询请求，参数为: deviceId = [{}], condition = [{}]", deviceId, sequenceConditionBean.getSequenceQuerySql());
 
         PreparedStatement pst = ckConn.prepareStatement(sequenceConditionBean.getSequenceQuerySql());
         pst.setString(1, deviceId);
-        pst.setLong(2, sequenceConditionBean.getStartTime());
-        pst.setLong(3, sequenceConditionBean.getEndTime());
+        pst.setLong(2, startTime);
+        pst.setLong(3, endTime);
 
         ResultSet resultSet = pst.executeQuery();
         int maxStep = 0;

@@ -10,6 +10,7 @@ import org.wizard.marketing.core.beans.SequenceConditionBean;
 import org.wizard.marketing.core.common.operators.CompareOperator;
 import org.wizard.marketing.core.service.query.ClickHouseQueryServiceImpl;
 import org.wizard.marketing.core.service.query.HbaseQueryServiceImpl;
+import org.wizard.marketing.core.service.query.StateQueryServiceImpl;
 import org.wizard.marketing.core.utils.ConnectionUtils;
 import org.wizard.marketing.core.utils.SegmentQueryUtils;
 
@@ -23,13 +24,13 @@ import java.util.Map;
  */
 @Slf4j
 public class SegmentQueryRouter {
-    Connection hbaseConn;
     HbaseQueryServiceImpl hbaseQueryService;
     ClickHouseQueryServiceImpl clickHouseQueryService;
+    StateQueryServiceImpl stateQueryService;
 
-    public SegmentQueryRouter() throws Exception {
+    public SegmentQueryRouter(ListState<EventBean> eventListState) throws Exception {
         // 获取一个hbase的连接
-        hbaseConn = ConnectionUtils.getHbaseConnection();
+        Connection hbaseConn = ConnectionUtils.getHbaseConnection();
         // 获取一个clickhouse的jdbc连接
         java.sql.Connection ckConn = ConnectionUtils.getClickHouseConnection();
 
@@ -38,6 +39,8 @@ public class SegmentQueryRouter {
         hbaseQueryService = new HbaseQueryServiceImpl(hbaseConn);
         // 构造一个clickhouse的查询服务
         clickHouseQueryService = new ClickHouseQueryServiceImpl(ckConn);
+        // 构造一个state的查询服务
+        stateQueryService = new StateQueryServiceImpl(eventListState);
     }
 
     /**
@@ -121,10 +124,21 @@ public class SegmentQueryRouter {
 
                 } else if (sequenceConditionBean.getStartTime() >= segmentPoint) {
                     log.debug("序列查询::分界点右边查询 只查询State");
+
+                    int step = stateQueryService.queryEventSequence(sequenceConditionBean.getConditions(), sequenceConditionBean.getStartTime(), sequenceConditionBean.getEndTime());
+                    if (step < sequenceConditionBean.getConditions().size()) return false;
                 } else {
                     log.debug("序列查询::跨界查询");
-                }
 
+                    int step1 = clickHouseQueryService.querySequenceCondition(event.getDeviceId(), sequenceConditionBean, sequenceConditionBean.getStartTime(), segmentPoint);
+                    List<ConditionBean> conditions = sequenceConditionBean.getConditions();
+                    if (step1 < conditions.size()) {
+                        // 根据ClickHouse中最大匹配数，来截取单个序列的条件组
+                        List<ConditionBean> cutOutConditions = conditions.subList(step1, conditions.size());
+                        int step2 = stateQueryService.queryEventSequence(cutOutConditions, segmentPoint, sequenceConditionBean.getEndTime());
+                        if (step1 + step2 < conditions.size()) return false;
+                    }
+                }
 
             }
         }
