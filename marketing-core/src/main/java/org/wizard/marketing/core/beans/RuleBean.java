@@ -26,9 +26,6 @@ public class RuleBean {
     // 次数条件
     private List<ConditionBean> countConditions;
 
-    /*
-     行为序列条件目前的缺陷:
-        只支持.*A.*B.*C.* 这种类型(意味着ABC三种行为中间)
-     */
+    // 序列条件
     private List<SequenceConditionBean> sequenceConditions;
 }
