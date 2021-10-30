@@ -18,7 +18,7 @@ public class MarketingRule {
     // 画像条件
     private Map<String, String> userProfileConditions;
     // 行为条件
-    private List<EventCombinationCondition> eventCombinationConditionList;
+    private List<EventCombCondition> eventCombConditionList;
     // 是否要注册timer
     private boolean isOnTimer;
 }

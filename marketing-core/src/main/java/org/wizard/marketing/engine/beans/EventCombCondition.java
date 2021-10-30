@@ -9,12 +9,12 @@ import java.util.List;
 /**
  * @Author: sodamnsure
  * @Date: 2021/10/30 4:09 下午
- * @Desc: 事件组合体条件封装，例如组合：[C !W F G](>=2)
+ * @Desc: EventCombinationCondition的简写::事件组合体条件封装，例如组合：[C !W F G](>=2)
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventCombinationCondition {
+public class EventCombCondition {
     /**
      * 组合条件要求发生的时间段起始
      */
