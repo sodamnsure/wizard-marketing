@@ -25,7 +25,7 @@ public class ApplicationRunner {
         env.setParallelism(1);
 
         KafkaSourceBuilder kafkaSourceBuilder = new KafkaSourceBuilder();
-        DataStream<String> stream = env.addSource(kafkaSourceBuilder.build("ActionLog"));
+        DataStream<String> stream = env.addSource(kafkaSourceBuilder.build("test"));
 
         DataStream<EventBean> streamWithBean = stream.map(new JsonToBeanFunction()).filter(Objects::nonNull);
 
