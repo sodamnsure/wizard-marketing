@@ -30,7 +30,7 @@ public class ActionLogGen {
                     ObjectMapper mapper = new ObjectMapper();
                     // 配置kafka
                     Properties props = new Properties();
-                    props.setProperty("bootstrap.servers", "feelings:9093");
+                    props.setProperty("bootstrap.servers", "client:9094");
                     props.put("acks", "all");
                     props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
                     props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -38,7 +38,7 @@ public class ActionLogGen {
                     while (true) {
                         EventBean logBean = new EventBean();
                         // logBean设置account: 生成1到10000之间的随机数，不足6位补齐0
-                        String account = StringUtils.leftPad(RandomUtils.nextInt(1, 100000) + "", 6, "0");
+                        String account = StringUtils.leftPad(RandomUtils.nextInt(1, 1000) + "", 6, "0");
                         logBean.setAccount(account);
                         // logBean设置appId
                         logBean.setAppId("com.feelings.marketing");
