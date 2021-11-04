@@ -30,7 +30,7 @@ public class ActionLogGen {
                     ObjectMapper mapper = new ObjectMapper();
                     // 配置kafka
                     Properties props = new Properties();
-                    props.setProperty("bootstrap.servers", "client:9094");
+                    props.setProperty("bootstrap.servers", "feelings:9092");
                     props.put("acks", "all");
                     props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
                     props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
