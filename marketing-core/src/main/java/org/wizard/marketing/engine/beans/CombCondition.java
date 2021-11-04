@@ -9,26 +9,26 @@ import java.util.List;
 /**
  * @Author: sodamnsure
  * @Date: 2021/10/30 4:09 下午
- * @Desc: EventCombinationCondition的简写::事件组合体条件封装，例如组合：[C !W F G](>=2)
+ * @Desc: CombinationCondition 的简写::组合条件封装，例如'事件组合'：[C !W F G](>=2)
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventCombCondition {
+public class CombCondition {
     /**
-     * 组合条件要求发生的时间段起始
+     * 组合条件要求'一堆事件'发生的时间段的起始时间
      */
     private long timeRangeStart;
 
     /**
-     * 组合条件要求发生的时间段结束
+     * 组合条件要求'一堆事件'发生的时间段的结束时间
      */
     private long timeRangeEnd;
 
     /**
-     * 组合条件中关心的事件列表
+     * 组合条件中关心的'一堆事件'列表
      */
-    private List<EventCondition> eventConditionList;
+    private List<Condition> conditionList;
 
     /**
      * 组合条件未来计算要用到的正则匹配表达式
@@ -36,12 +36,12 @@ public class EventCombCondition {
     private String matchPattern;
 
     /**
-     * 组合条件要求发生的最小次数
+     * 组合条件要求'一堆事件'发生的最小次数
      */
     private int minLimit;
 
     /**
-     * 组合条件要求发生的最大次数
+     * 组合条件要求'一堆事件'发生的最大次数
      */
     private int maxLimit;
 
