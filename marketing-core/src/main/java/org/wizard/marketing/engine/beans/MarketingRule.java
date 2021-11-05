@@ -1,5 +1,7 @@
 package org.wizard.marketing.engine.beans;
 
+import lombok.Data;
+
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +10,7 @@ import java.util.Map;
  * @Date: 2021/10/30 4:30 下午
  * @Desc: 营销规则
  */
+@Data
 public class MarketingRule {
     /**
      * 规则ID
