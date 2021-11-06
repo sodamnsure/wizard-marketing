@@ -22,7 +22,7 @@ public class UserProfileDataGen {
     public static void main(String[] args) throws IOException {
         // 创建HBASE配置
         Configuration conf = new Configuration();
-        conf.set("hbase.zookeeper.quorum", "feelings:2181");
+        conf.set("hbase.zookeeper.quorum", "marketing:2181");
         // 创建HBASE链接
         Connection conn = ConnectionFactory.createConnection(conf);
         // 创建链接后要拿到表
