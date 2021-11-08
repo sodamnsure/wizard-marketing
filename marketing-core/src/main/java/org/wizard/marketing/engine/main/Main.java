@@ -10,7 +10,7 @@ import org.wizard.marketing.engine.beans.EventBean;
 import org.wizard.marketing.engine.beans.ResultBean;
 import org.wizard.marketing.engine.functions.JsonToBeanFunction;
 import org.wizard.marketing.engine.functions.KafkaSourceBuilder;
-import org.wizard.marketing.engine.functions.MatchRuleFunction;
+import org.wizard.marketing.engine.functions.RuleMatchFunction;
 
 import java.util.Objects;
 
@@ -31,7 +31,7 @@ public class Main {
           读取kafka中的用户行为日志
          */
         KafkaSourceBuilder kafkaSourceBuilder = new KafkaSourceBuilder();
-        DataStream<String> stream = env.addSource(kafkaSourceBuilder.build("test"));
+        DataStream<String> stream = env.addSource(kafkaSourceBuilder.build("ActionLog"));
 
         /*
           Json解析
@@ -46,7 +46,7 @@ public class Main {
         /*
           规则计算
          */
-        SingleOutputStreamOperator<ResultBean> process = keyedStream.process(new MatchRuleFunction());
+        SingleOutputStreamOperator<ResultBean> process = keyedStream.process(new RuleMatchFunction());
 
         process.print();
 
