@@ -1,4 +1,4 @@
-package org.wizard.marketing.engine.querier;
+package org.wizard.marketing.engine.dao;
 
 /**
  * @Author: sodamnsure
