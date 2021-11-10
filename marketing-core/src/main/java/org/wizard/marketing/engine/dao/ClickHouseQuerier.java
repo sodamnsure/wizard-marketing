@@ -2,13 +2,12 @@ package org.wizard.marketing.engine.dao;
 
 import org.wizard.marketing.engine.beans.CombCondition;
 import org.wizard.marketing.engine.beans.Condition;
+import org.wizard.marketing.engine.utils.EventUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @Author: sodamnsure
@@ -65,14 +64,7 @@ public class ClickHouseQuerier {
     public int getCombConditionCount(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
         // 先查询到用户在组合条件中做过的事件的字符串序列
         String eventSeqStr = getCombConditionStr(deviceId, combCondition, queryRangeStart, queryRangeEnd);
-        // 然后取出组合条件中的正则表达式
-        String pattern = combCondition.getMatchPattern();
-        // 匹配正则表达式，得到匹配的次数
-        Pattern compile = Pattern.compile(pattern);
-        Matcher matcher = compile.matcher(eventSeqStr);
-        int count = 0;
-        while (matcher.find()) count++;
-        return count;
+        return EventUtils.eventSeqStrMatchRegexCount(eventSeqStr, combCondition.getMatchPattern());
     }
 
 }

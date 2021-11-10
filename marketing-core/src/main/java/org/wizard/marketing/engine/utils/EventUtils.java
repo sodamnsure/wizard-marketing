@@ -29,9 +29,9 @@ public class EventUtils {
     }
 
 
-    public static int eventStrMatchGroupCount(String eventStr, String pattern) {
+    public static int eventSeqStrMatchRegexCount(String eventSeqStr, String pattern) {
         Pattern r = Pattern.compile(pattern);
-        Matcher matcher = r.matcher(eventStr);
+        Matcher matcher = r.matcher(eventSeqStr);
         int count = 0;
         while (matcher.find()) count++;
         return count;
