@@ -21,8 +21,8 @@ public class RuleMonitor {
         // 设置触发事件
         HashMap<String, String> map = new HashMap<>();
         map.put("p2", "v1");
-        Condition triggerEvent = new Condition("K", map, -1, Long.MAX_VALUE, 1, 999);
-        rule.setTriggerEvent(triggerEvent);
+        Condition triggerCondition = new Condition("K", map, -1, Long.MAX_VALUE, 1, 999);
+        rule.setTriggerCondition(triggerCondition);
 
         // 画像条件
         HashMap<String, String> map1 = new HashMap<>();

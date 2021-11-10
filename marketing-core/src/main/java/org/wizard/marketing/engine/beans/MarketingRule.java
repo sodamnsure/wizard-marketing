@@ -18,9 +18,9 @@ public class MarketingRule {
     private String ruleId;
 
     /**
-     * 触发事件
+     * 触发条件
      */
-    private Condition triggerEvent;
+    private Condition triggerCondition;
 
     /**
      * 规则匹配推送次数限制

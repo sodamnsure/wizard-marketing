@@ -26,7 +26,7 @@ public class RuleMatchFunction extends KeyedProcessFunction<String, EventBean, R
     @Override
     public void processElement(EventBean event, Context context, Collector<ResultBean> collector) throws Exception {
         MarketingRule rule = RuleMonitor.getRule();
-        if (!EventUtils.eventMatchCondition(event, rule.getTriggerEvent())) return;
+        if (!EventUtils.eventMatchCondition(event, rule.getTriggerCondition())) return;
 
         // 查询用户画像
 
