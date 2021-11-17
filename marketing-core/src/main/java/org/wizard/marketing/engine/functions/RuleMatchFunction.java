@@ -1,14 +1,19 @@
 package org.wizard.marketing.engine.functions;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 import org.wizard.marketing.engine.beans.EventBean;
 import org.wizard.marketing.engine.beans.MarketingRule;
 import org.wizard.marketing.engine.beans.ResultBean;
-import org.wizard.marketing.engine.utils.EventUtils;
+import org.wizard.marketing.engine.controller.TriggerModelController;
 import org.wizard.marketing.engine.utils.RuleMonitor;
+import org.wizard.marketing.engine.utils.StateDescContainer;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @Author: sodamnsure
@@ -17,19 +22,31 @@ import org.wizard.marketing.engine.utils.RuleMonitor;
  */
 @Slf4j
 public class RuleMatchFunction extends KeyedProcessFunction<String, EventBean, ResultBean> {
+    List<MarketingRule> ruleList;
+    ListState<EventBean> listState;
+    TriggerModelController triggerModelController;
 
     @Override
     public void open(Configuration parameters) throws Exception {
-
+        // 用模拟器获取一个规则
+        MarketingRule rule = RuleMonitor.getRule();
+        ruleList = Collections.singletonList(rule);
+        // 获取触发形规则模型Controller
+        listState = getRuntimeContext().getListState(StateDescContainer.getEventBeansDesc());
+        triggerModelController = new TriggerModelController(listState);
     }
 
     @Override
     public void processElement(EventBean event, Context context, Collector<ResultBean> collector) throws Exception {
-        MarketingRule rule = RuleMonitor.getRule();
-        if (!EventUtils.eventMatchCondition(event, rule.getTriggerCondition())) return;
+        // 将数据流事件放入state
+        listState.add(event);
 
-        // 查询用户画像
-
-        // 查询行为组合
+        for (MarketingRule rule : ruleList) {
+            boolean isMatch = triggerModelController.ruleIsMatch(rule, event);
+            if (isMatch) {
+                ResultBean resultBean = new ResultBean(event.getDeviceId(), rule.getRuleId(), event.getTimeStamp(), System.currentTimeMillis());
+                collector.collect(resultBean);
+            }
+        }
     }
 }

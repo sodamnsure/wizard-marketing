@@ -31,7 +31,7 @@ public class Main {
           读取kafka中的用户行为日志
          */
         KafkaSourceBuilder kafkaSourceBuilder = new KafkaSourceBuilder();
-        DataStream<String> stream = env.addSource(kafkaSourceBuilder.build("ActionLog"));
+        DataStream<String> stream = env.addSource(kafkaSourceBuilder.build());
 
         /*
           Json解析
