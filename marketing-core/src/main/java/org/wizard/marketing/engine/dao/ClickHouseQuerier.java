@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Author: sodamnsure
@@ -42,13 +43,15 @@ public class ClickHouseQuerier {
 
         // 从组合条件中取出该组合所关心的事件列表
         List<Condition> conditionList = combCondition.getConditionList();
+        List<String> ids = conditionList.stream().map(Condition::getEventId).collect(Collectors.toList());
+
         // 遍历ClickHouse返回的结果
         ResultSet resultSet = stat.executeQuery();
         StringBuilder sb = new StringBuilder();
         while (resultSet.next()) {
             String eventId = resultSet.getString(1);
             // 根据eventId到组合条件的事件列表中找到对应的索引号, 来作为最终结果拼凑
-            sb.append(conditionList.indexOf(eventId) + 1);
+            sb.append(ids.indexOf(eventId) + 1);
         }
 
         return sb.toString();
