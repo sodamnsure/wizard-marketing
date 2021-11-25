@@ -1,5 +1,6 @@
 package org.wizard.marketing.engine.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.wizard.marketing.engine.beans.Condition;
 import org.wizard.marketing.engine.beans.EventBean;
 
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
  * @Date: 2021/11/8 5:20 下午
  * @Desc: 事件工具类
  */
+@Slf4j
 public class EventUtils {
     public static String eventSeqToStr(Iterator<EventBean> eventSeq, List<Condition> conditionList) {
         StringBuilder sb = new StringBuilder();
@@ -34,6 +36,7 @@ public class EventUtils {
         Matcher matcher = r.matcher(eventSeqStr);
         int count = 0;
         while (matcher.find()) count++;
+        log.debug("字符串正则匹配，正则表达式为: {}, 匹配结果为: {}, 字符串为: {}", pattern, count, eventSeqStr);
         return count;
     }
 
@@ -42,7 +45,8 @@ public class EventUtils {
             Set<String> keySet = condition.getEventProps().keySet();
             for (String key : keySet) {
                 String conditionValue = condition.getEventProps().get(key);
-                if (!event.getProperties().get(key).equals(conditionValue)) {
+                // null调用equals方法，空指针异常，一般 [常量.equals(变量)]
+                if (!conditionValue.equals(event.getProperties().get(key))) {
                     return false;
                 }
             }

@@ -1,5 +1,6 @@
 package org.wizard.marketing.engine.dao;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
@@ -15,6 +16,7 @@ import java.util.Set;
  * @Date: 2021/11/8 6:11 下午
  * @Desc: Hbase查询器
  */
+@Slf4j
 public class HbaseQuerier {
     Table table;
     String family;
@@ -45,7 +47,11 @@ public class HbaseQuerier {
         Result result = table.get(get);
         for (String tag : tags) {
             byte[] bytes = result.getValue(family.getBytes(), tag.getBytes());
-            String value = new String(bytes);
+            String value = null;
+            if (bytes != null) {
+                value = new String(bytes);
+            }
+            log.debug("规则画像条件标签: [{}: {}], 查询到的标签为: [{}: {}]}", tag, profileConditions.get(tag), tag, value);
             if (StringUtils.isBlank(value) || !profileConditions.get(tag).equals(value)) return false;
         }
         return true;

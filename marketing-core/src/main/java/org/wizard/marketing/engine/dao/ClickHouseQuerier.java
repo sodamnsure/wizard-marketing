@@ -1,5 +1,6 @@
 package org.wizard.marketing.engine.dao;
 
+import lombok.extern.slf4j.Slf4j;
 import org.wizard.marketing.engine.beans.CombCondition;
 import org.wizard.marketing.engine.beans.Condition;
 import org.wizard.marketing.engine.utils.EventUtils;
@@ -14,6 +15,7 @@ import java.util.List;
  * @Date: 2021/11/8 6:12 下午
  * @Desc: ClickHouse查询器
  */
+@Slf4j
 public class ClickHouseQuerier {
     Connection conn;
 
@@ -65,7 +67,10 @@ public class ClickHouseQuerier {
         // 先查询到用户在组合条件中做过的事件的字符串序列
         String eventSeqStr = getCombConditionStr(deviceId, combCondition, queryRangeStart, queryRangeEnd);
         // 调用工具，来获取事件序列与正则表达式的匹配次数--即组合条件发生的次数
-        return EventUtils.eventSeqStrMatchRegexCount(eventSeqStr, combCondition.getMatchPattern());
+        int count = EventUtils.eventSeqStrMatchRegexCount(eventSeqStr, combCondition.getMatchPattern());
+
+        log.debug("在ClickHouse中查询组合事件条件，得到的事件序列字符串: {}, 正则表达式: {}, 匹配结果: {}", eventSeqStr, combCondition.getMatchPattern(), count);
+        return count;
     }
 
 }

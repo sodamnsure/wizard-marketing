@@ -40,7 +40,7 @@ public class RuleMatchFunction extends KeyedProcessFunction<String, EventBean, R
     public void processElement(EventBean event, Context context, Collector<ResultBean> collector) throws Exception {
         // 将数据流事件放入state
         listState.add(event);
-        log.debug("接收到事件：{}", event);
+        log.debug("接收到事件, 用户ID为：{}, 用户事件为: {}", event.getDeviceId(), event.getEventId());
         for (MarketingRule rule : ruleList) {
             log.debug("匹配一个规则：{}", rule.getRuleId());
             boolean isMatch = triggerModelController.ruleIsMatch(rule, event);
