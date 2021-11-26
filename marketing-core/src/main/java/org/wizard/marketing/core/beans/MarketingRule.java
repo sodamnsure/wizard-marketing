@@ -40,5 +40,10 @@ public class MarketingRule {
     /**
      * 是否要注册timer
      */
-    private boolean isOnTimer;
+    private boolean OnTimer;
+
+    /**
+     * 定时条件:: 目前限定一个规则中只有一个时间条件
+     */
+    private List<TimerCondition> timerConditions;
 }

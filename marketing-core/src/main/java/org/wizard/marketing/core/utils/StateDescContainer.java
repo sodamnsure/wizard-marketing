@@ -1,9 +1,12 @@
 package org.wizard.marketing.core.utils;
 
 import org.apache.flink.api.common.state.ListStateDescriptor;
+import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.state.StateTtlConfig;
 import org.apache.flink.api.common.time.Time;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.wizard.marketing.core.beans.EventBean;
+import org.wizard.marketing.core.beans.MarketingRule;
 
 /**
  * @Author: sodamnsure
@@ -23,6 +26,13 @@ public class StateDescContainer {
         eventBeansDesc.enableTimeToLive(stateTtlConfig);
 
         return eventBeansDesc;
+    }
+
+    /**
+     * 记录规则定时注册信息的状态描述
+     */
+    public static MapStateDescriptor<MarketingRule, Long> getRuleTimerStateDesc() {
+        return new MapStateDescriptor<>("rule_timer", TypeInformation.of(MarketingRule.class), TypeInformation.of(Long.class));
     }
 
 }
