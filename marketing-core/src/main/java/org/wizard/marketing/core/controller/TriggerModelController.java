@@ -1,10 +1,7 @@
 package org.wizard.marketing.core.controller;
 
 import org.apache.flink.api.common.state.ListState;
-import org.wizard.marketing.core.beans.Condition;
-import org.wizard.marketing.core.beans.CombCondition;
-import org.wizard.marketing.core.beans.EventBean;
-import org.wizard.marketing.core.beans.MarketingRule;
+import org.wizard.marketing.core.beans.*;
 import org.wizard.marketing.core.service.TriggerModelServiceImpl;
 import org.wizard.marketing.core.utils.EventUtils;
 
@@ -56,6 +53,29 @@ public class TriggerModelController {
                 // 后面会使用规则系统动态判断多个组合条件之间的且与或关系
                 if (!b) return false;
             }
+        }
+        return true;
+    }
+
+    /**
+     * 检查定时条件是否满足
+     *
+     * @param deviceId        账户ID
+     * @param timerCondition  定时条件
+     * @param queryRangeStart 起始时间
+     * @param queryRangeEnd   结束时间
+     * @return 定时条件是否匹配
+     */
+    public boolean isMatchTimerCondition(String deviceId, TimerCondition timerCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
+        List<CombCondition> actionConditions = timerCondition.getActionConditions();
+        for (CombCondition combCondition : actionConditions) {
+            combCondition.setTimeRangeStart(queryRangeStart);
+            combCondition.setTimeRangeEnd(queryRangeEnd);
+
+            EventBean eventBean = new EventBean();
+            eventBean.setDeviceId(deviceId);
+            boolean b = triggerModelService.matchCombCondition(eventBean, combCondition);
+            if (!b) return false;
         }
         return true;
     }

@@ -2,18 +2,20 @@ package org.wizard.marketing.core.functions;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.state.ListState;
-import org.apache.flink.api.common.state.MapState;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
-import org.wizard.marketing.core.beans.*;
+import org.wizard.marketing.core.beans.EventBean;
+import org.wizard.marketing.core.beans.MarketingRule;
+import org.wizard.marketing.core.beans.ResultBean;
+import org.wizard.marketing.core.beans.TimerCondition;
 import org.wizard.marketing.core.controller.TriggerModelController;
 import org.wizard.marketing.core.utils.RuleMonitor;
 import org.wizard.marketing.core.utils.StateDescContainer;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Author: sodamnsure
@@ -24,7 +26,7 @@ import java.util.Map;
 public class RuleMatchFunction extends KeyedProcessFunction<String, EventBean, ResultBean> {
     List<MarketingRule> ruleList;
     ListState<EventBean> listState;
-    MapState<MarketingRule, Long> ruleTimerState;
+    ListState<Tuple2<MarketingRule, Long>> ruleTimerState;
     TriggerModelController triggerModelController;
 
     @Override
@@ -36,7 +38,7 @@ public class RuleMatchFunction extends KeyedProcessFunction<String, EventBean, R
         listState = getRuntimeContext().getListState(StateDescContainer.getEventBeansDesc());
         triggerModelController = new TriggerModelController(listState);
         // 记录规则定时注册信息的State
-        ruleTimerState = getRuntimeContext().getMapState(StateDescContainer.getRuleTimerStateDesc());
+        ruleTimerState = getRuntimeContext().getListState(StateDescContainer.getRuleTimerStateDesc());
     }
 
     @Override
@@ -61,7 +63,7 @@ public class RuleMatchFunction extends KeyedProcessFunction<String, EventBean, R
                     TimerCondition timerCondition = timerConditions.get(0);
                     context.timerService().registerEventTimeTimer(event.getTimeStamp() + timerCondition.getTimeLate());
                     // 在定时信息State中记录
-                    ruleTimerState.put(rule, event.getTimeStamp() + timerCondition.getTimeLate());
+                    ruleTimerState.add(Tuple2.of(rule, event.getTimeStamp() + timerCondition.getTimeLate()));
                 } else {
                     ResultBean resultBean = new ResultBean(event.getDeviceId(), rule.getRuleId(), event.getTimeStamp(), System.currentTimeMillis());
                     collector.collect(resultBean);
@@ -72,18 +74,21 @@ public class RuleMatchFunction extends KeyedProcessFunction<String, EventBean, R
 
     @Override
     public void onTimer(long timestamp, KeyedProcessFunction<String, EventBean, ResultBean>.OnTimerContext ctx, Collector<ResultBean> out) throws Exception {
-        Iterable<Map.Entry<MarketingRule, Long>> entries = ruleTimerState.entries();
-        for (Map.Entry<MarketingRule, Long> entry : entries) {
+        Iterable<Tuple2<MarketingRule, Long>> ruleTimerStateIterable = ruleTimerState.get();
+        for (Tuple2<MarketingRule, Long> tp : ruleTimerStateIterable) {
             // 判断"规则+定时点"，是否对应本次触发点
-
-            // 如果不对应，直接continue
-
-            // 如果对应，检查该规则的定时条件
-            MarketingRule rule = entry.getKey();
-            TimerCondition timerCondition = rule.getTimerConditions().get(0);
-            List<CombCondition> actionConditions = timerCondition.getActionConditions();
-            // 调用service去检查在条件指定的时间范围内，组合事件发生的次数是否满足
-
+            if (tp.f1 == timestamp) {
+                // 如果对应，检查该规则的定时条件
+                MarketingRule rule = tp.f0;
+                TimerCondition timerCondition = rule.getTimerConditions().get(0);
+                // 调用service去检查在条件指定的时间范围内，组合事件发生的次数是否满足
+                boolean b = triggerModelController.isMatchTimerCondition(ctx.getCurrentKey(), timerCondition,
+                        timestamp - timerCondition.getTimeLate(), timestamp);
+                if (b) {
+                    ResultBean resultBean = new ResultBean(ctx.getCurrentKey(), rule.getRuleId(), timestamp, System.currentTimeMillis());
+                    out.collect(resultBean);
+                }
+            }
         }
     }
 }
