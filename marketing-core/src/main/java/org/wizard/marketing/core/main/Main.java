@@ -1,5 +1,7 @@
 package org.wizard.marketing.core.main;
 
+import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
@@ -8,10 +10,11 @@ import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.wizard.marketing.core.beans.EventBean;
 import org.wizard.marketing.core.beans.ResultBean;
-import org.wizard.marketing.core.functions.KafkaSourceBuilder;
 import org.wizard.marketing.core.functions.JsonToBeanFunction;
+import org.wizard.marketing.core.functions.KafkaSourceBuilder;
 import org.wizard.marketing.core.functions.RuleMatchFunction;
 
+import java.time.Duration;
 import java.util.Objects;
 
 /**
@@ -39,9 +42,16 @@ public class Main {
         DataStream<EventBean> streamWithBean = stream.map(new JsonToBeanFunction()).filter(Objects::nonNull);
 
         /*
+          分配水印
+         */
+        WatermarkStrategy<EventBean> watermarkStrategy = WatermarkStrategy.<EventBean>forBoundedOutOfOrderness(Duration.ofMillis(0))
+                .withTimestampAssigner((SerializableTimestampAssigner<EventBean>) (eventBean, l) -> eventBean.getTimeStamp());
+        SingleOutputStreamOperator<EventBean> streamWithWatermark = streamWithBean.assignTimestampsAndWatermarks(watermarkStrategy);
+
+        /*
           选取DeviceId作为Key
          */
-        KeyedStream<EventBean, String> keyedStream = streamWithBean.keyBy(EventBean::getDeviceId);
+        KeyedStream<EventBean, String> keyedStream = streamWithWatermark.keyBy(EventBean::getDeviceId);
 
         /*
           规则计算
