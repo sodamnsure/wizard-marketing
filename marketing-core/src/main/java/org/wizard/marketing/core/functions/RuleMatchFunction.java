@@ -15,6 +15,7 @@ import org.wizard.marketing.core.utils.RuleMonitor;
 import org.wizard.marketing.core.utils.StateDescContainer;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -61,9 +62,10 @@ public class RuleMatchFunction extends KeyedProcessFunction<String, EventBean, R
                     List<TimerCondition> timerConditions = rule.getTimerConditions();
                     // 目前限定一个规则只有一个时间条件
                     TimerCondition timerCondition = timerConditions.get(0);
-                    context.timerService().registerEventTimeTimer(event.getTimeStamp() + timerCondition.getTimeLate());
+                    long triggerTime = event.getTimeStamp() + timerCondition.getTimeLate();
+                    context.timerService().registerEventTimeTimer(triggerTime);
                     // 在定时信息State中记录
-                    ruleTimerState.add(Tuple2.of(rule, event.getTimeStamp() + timerCondition.getTimeLate()));
+                    ruleTimerState.add(Tuple2.of(rule, triggerTime));
                 } else {
                     ResultBean resultBean = new ResultBean(event.getDeviceId(), rule.getRuleId(), event.getTimeStamp(), System.currentTimeMillis());
                     collector.collect(resultBean);
@@ -75,7 +77,9 @@ public class RuleMatchFunction extends KeyedProcessFunction<String, EventBean, R
     @Override
     public void onTimer(long timestamp, KeyedProcessFunction<String, EventBean, ResultBean>.OnTimerContext ctx, Collector<ResultBean> out) throws Exception {
         Iterable<Tuple2<MarketingRule, Long>> ruleTimerStateIterable = ruleTimerState.get();
-        for (Tuple2<MarketingRule, Long> tp : ruleTimerStateIterable) {
+        Iterator<Tuple2<MarketingRule, Long>> iterator = ruleTimerStateIterable.iterator();
+        while (iterator.hasNext()) {
+            Tuple2<MarketingRule, Long> tp = iterator.next();
             // 判断"规则+定时点"，是否对应本次触发点
             if (tp.f1 == timestamp) {
                 // 如果对应，检查该规则的定时条件
@@ -84,10 +88,17 @@ public class RuleMatchFunction extends KeyedProcessFunction<String, EventBean, R
                 // 调用service去检查在条件指定的时间范围内，组合事件发生的次数是否满足
                 boolean b = triggerModelController.isMatchTimerCondition(ctx.getCurrentKey(), timerCondition,
                         timestamp - timerCondition.getTimeLate(), timestamp);
+                // 清楚state中记录的已经检查完毕的定时规则信息
+                iterator.remove();
                 if (b) {
                     ResultBean resultBean = new ResultBean(ctx.getCurrentKey(), rule.getRuleId(), timestamp, System.currentTimeMillis());
                     out.collect(resultBean);
                 }
+            }
+
+            // 增加删除state中过期定时信息的逻辑
+            if (tp.f1 < timestamp) {
+                iterator.remove();
             }
         }
     }
