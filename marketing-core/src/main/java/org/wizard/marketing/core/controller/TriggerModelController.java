@@ -72,8 +72,11 @@ public class TriggerModelController {
             combCondition.setTimeRangeStart(queryRangeStart);
             combCondition.setTimeRangeEnd(queryRangeEnd);
 
+            // 因为service的条件计算方法中，需要知道查询deviceId，还需要一个时间戳来计算分界点
             EventBean eventBean = new EventBean();
             eventBean.setDeviceId(deviceId);
+            eventBean.setTimeStamp(queryRangeEnd);
+
             boolean b = triggerModelService.matchCombCondition(eventBean, combCondition);
             if (!b) return false;
         }
