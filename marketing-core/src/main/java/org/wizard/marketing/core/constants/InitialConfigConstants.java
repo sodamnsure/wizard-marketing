@@ -1,11 +1,11 @@
-package org.wizard.marketing.core.utils;
+package org.wizard.marketing.core.constants;
 
 /**
  * @Author: sodamnsure
  * @Date: 2021/8/18 12:15 下午
  * @Desc: 配置文件，参数名称统一管理类
  */
-public class ConfigNames {
+public class InitialConfigConstants {
     public static final String KAFKA_BOOTSTRAP_SERVERS = "kafka.bootstrap.servers";
     public static final String KAFKA_AUTO_OFFSET_RESET = "kafka.auto.offset.reset";
     public static final String KAFKA_ACTION_DETAIL_TOPIC = "kafka.action_detail.topic";

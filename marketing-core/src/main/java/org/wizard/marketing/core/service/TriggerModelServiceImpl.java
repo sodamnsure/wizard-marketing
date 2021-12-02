@@ -7,7 +7,7 @@ import org.wizard.marketing.core.beans.EventBean;
 import org.wizard.marketing.core.dao.ClickHouseQuerier;
 import org.wizard.marketing.core.dao.HbaseQuerier;
 import org.wizard.marketing.core.dao.StateQuerier;
-import org.wizard.marketing.core.utils.ConfigNames;
+import org.wizard.marketing.core.constants.InitialConfigConstants;
 import org.wizard.marketing.core.utils.CrossTimeQueryUtils;
 import org.wizard.marketing.core.utils.EventUtils;
 import org.wizard.marketing.core.beans.CombCondition;
@@ -39,8 +39,8 @@ public class TriggerModelServiceImpl {
         clickHouseQuerier = new ClickHouseQuerier(clickHouseConn);
 
         org.apache.hadoop.hbase.client.Connection hbaseConn = ConnectionUtils.getHbaseConnection();
-        String profileTable = config.getString(ConfigNames.HBASE_PROFILE_TABLE);
-        String profileFamily = config.getString(ConfigNames.HBASE_PROFILE_FAMILY);
+        String profileTable = config.getString(InitialConfigConstants.HBASE_PROFILE_TABLE);
+        String profileFamily = config.getString(InitialConfigConstants.HBASE_PROFILE_FAMILY);
         hbaseQuerier = new HbaseQuerier(hbaseConn, profileTable, profileFamily);
 
         stateQuerier = new StateQuerier(listState);

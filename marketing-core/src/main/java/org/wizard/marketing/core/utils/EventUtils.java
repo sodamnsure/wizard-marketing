@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.wizard.marketing.core.beans.Condition;
 import org.wizard.marketing.core.beans.EventBean;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,20 +15,6 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 public class EventUtils {
-    public static String eventSeqToStr(Iterator<EventBean> eventSeq, List<Condition> conditionList) {
-        StringBuilder sb = new StringBuilder();
-        while (eventSeq.hasNext()) {
-            EventBean next = eventSeq.next();
-            for (int i = 0; i < conditionList.size(); i++) {
-                if (eventMatchCondition(next, conditionList.get(i - 1))) {
-                    sb.append(i);
-                }
-            }
-        }
-        return sb.toString();
-    }
-
-
     public static int eventSeqStrMatchRegexCount(String eventSeqStr, String pattern) {
         Pattern r = Pattern.compile(pattern);
         Matcher matcher = r.matcher(eventSeqStr);
