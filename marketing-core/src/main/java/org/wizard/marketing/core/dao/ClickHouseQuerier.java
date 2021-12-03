@@ -67,10 +67,14 @@ public class ClickHouseQuerier {
      * @return 出现的次数
      */
     public int getCombConditionCount(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
+        // TODO 缓存读处理
+
         // 先查询到用户在组合条件中做过的事件的字符串序列
         String eventSeqStr = getCombConditionStr(deviceId, combCondition, queryRangeStart, queryRangeEnd);
         // 调用工具，来获取事件序列与正则表达式的匹配次数--即组合条件发生的次数
         int count = EventUtils.eventSeqStrMatchRegexCount(eventSeqStr, combCondition.getMatchPattern());
+
+        // TODO 缓存写处理
 
         log.debug("在ClickHouse中查询组合事件条件，得到的事件序列字符串: {}, 正则表达式: {}, 匹配结果: {}", eventSeqStr, combCondition.getMatchPattern(), count);
         return count;
