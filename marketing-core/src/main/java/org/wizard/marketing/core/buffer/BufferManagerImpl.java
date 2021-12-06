@@ -4,6 +4,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.wizard.marketing.core.beans.BufferData;
 import org.wizard.marketing.core.constants.InitialConfigConstants;
+import org.wizard.marketing.core.utils.BufferUtils;
 import org.wizard.marketing.core.utils.ConnectionUtils;
 import redis.clients.jedis.Jedis;
 
@@ -26,13 +27,13 @@ public class BufferManagerImpl implements BufferManager {
     public BufferData getDataFromBuffer(String bufferKey) {
         String value = jedis.get(bufferKey);
 
-        return BufferData.of(bufferKey, value);
+        return BufferUtils.of(bufferKey, value);
     }
 
     @Override
     public boolean putDataToBuffer(BufferData bufferData) {
         try {
-            jedis.psetex(bufferData.getBufferKey(), period, bufferData.getValue());
+            jedis.psetex(bufferData.getBufferKey(), period, bufferData.getBufferValue());
         } catch (Exception e) {
             jedis.close();
             jedis = ConnectionUtils.getRedisConnection();

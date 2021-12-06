@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.wizard.marketing.core.utils.BufferUtils;
 
 /**
  * @Author: sodamnsure
@@ -13,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Slf4j
 public class BufferData {
     /**
      * 账号
@@ -36,29 +36,15 @@ public class BufferData {
     private long timeRangeEnd;
 
     /**
-     * 缓存返回的关心事件列表
+     * 缓存返回的关心事件列表字符串
      */
-    private String value;
-
-    public static BufferData of(String bufferKey, String value) {
-        BufferData bufferData = new BufferData();
-        try {
-            String[] split = bufferKey.split(":");
-
-            bufferData.setDeviceId(split[0]);
-            bufferData.setCacheId(split[1]);
-            bufferData.setTimeRangeStart(Long.parseLong(split[2]));
-            bufferData.setTimeRangeEnd(Long.parseLong(split[3]));
-            bufferData.setValue(value);
-        } catch (Exception e) {
-            log.error("缓存数据构造失败, bufferKey:{}, value:{}", bufferKey, value);
-        }
-
-        return bufferData;
-
-    }
+    private String seqStr;
 
     public String getBufferKey() {
-        return this.getDeviceId() + ":" + this.getCacheId() + ":" + this.getTimeRangeStart() + ":" + this.getTimeRangeEnd();
+        return BufferUtils.genBufferKey(this.deviceId, this.cacheId);
+    }
+
+    public String getBufferValue() {
+        return BufferUtils.genBufferValue(this.seqStr, this.timeRangeStart, this.timeRangeEnd);
     }
 }

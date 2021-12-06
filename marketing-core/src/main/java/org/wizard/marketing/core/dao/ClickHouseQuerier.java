@@ -1,8 +1,12 @@
 package org.wizard.marketing.core.dao;
 
 import lombok.extern.slf4j.Slf4j;
-import org.wizard.marketing.core.beans.Condition;
+import org.wizard.marketing.core.beans.BufferData;
 import org.wizard.marketing.core.beans.CombCondition;
+import org.wizard.marketing.core.beans.Condition;
+import org.wizard.marketing.core.buffer.BufferManager;
+import org.wizard.marketing.core.buffer.BufferManagerImpl;
+import org.wizard.marketing.core.utils.BufferUtils;
 import org.wizard.marketing.core.utils.EventUtils;
 
 import java.sql.Connection;
@@ -19,9 +23,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ClickHouseQuerier {
     Connection conn;
+    BufferManager bufferManager;
 
     public ClickHouseQuerier(Connection conn) {
         this.conn = conn;
+        bufferManager = new BufferManagerImpl();
     }
 
     /**
@@ -67,7 +73,9 @@ public class ClickHouseQuerier {
      * @return 出现的次数
      */
     public int getCombConditionCount(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
-        // TODO 缓存读处理
+        // 缓存读处理
+        BufferData dataFromBuffer = bufferManager.getDataFromBuffer(BufferUtils.genBufferKey(deviceId, combCondition.getCacheId()));
+
 
         // 先查询到用户在组合条件中做过的事件的字符串序列
         String eventSeqStr = getCombConditionStr(deviceId, combCondition, queryRangeStart, queryRangeEnd);
