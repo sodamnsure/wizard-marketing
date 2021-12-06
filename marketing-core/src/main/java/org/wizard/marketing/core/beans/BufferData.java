@@ -3,6 +3,7 @@ package org.wizard.marketing.core.beans;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Author: sodamnsure
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class BufferData {
     /**
      * 账号
@@ -38,8 +40,25 @@ public class BufferData {
      */
     private String value;
 
-    /**
-     * 缓存返回的主键
-     */
-    private String bufferKey;
+    public static BufferData of(String bufferKey, String value) {
+        BufferData bufferData = new BufferData();
+        try {
+            String[] split = bufferKey.split(":");
+
+            bufferData.setDeviceId(split[0]);
+            bufferData.setCacheId(split[1]);
+            bufferData.setTimeRangeStart(Long.parseLong(split[2]));
+            bufferData.setTimeRangeEnd(Long.parseLong(split[3]));
+            bufferData.setValue(value);
+        } catch (Exception e) {
+            log.error("缓存数据构造失败, bufferKey:{}, value:{}", bufferKey, value);
+        }
+
+        return bufferData;
+
+    }
+
+    public String getBufferKey() {
+        return this.getDeviceId() + ":" + this.getCacheId() + ":" + this.getTimeRangeStart() + ":" + this.getTimeRangeEnd();
+    }
 }
