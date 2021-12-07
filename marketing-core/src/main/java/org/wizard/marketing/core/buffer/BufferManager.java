@@ -2,6 +2,8 @@ package org.wizard.marketing.core.buffer;
 
 import org.wizard.marketing.core.beans.BufferData;
 
+import java.util.Map;
+
 /**
  * @Author: sodamnsure
  * @Date: 2021/11/8 6:13 下午
@@ -13,5 +15,5 @@ public interface BufferManager {
 
     boolean putDataToBuffer(BufferData bufferData);
 
-    boolean putDataToBuffer(String bufferKey, String value);
+    boolean putDataToBuffer(String bufferKey, Map<String, String> valueMap);
 }

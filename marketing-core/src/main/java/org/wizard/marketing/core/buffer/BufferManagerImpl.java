@@ -2,11 +2,13 @@ package org.wizard.marketing.core.buffer;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.kafka.common.protocol.types.Field;
 import org.wizard.marketing.core.beans.BufferData;
 import org.wizard.marketing.core.constants.InitialConfigConstants;
-import org.wizard.marketing.core.utils.BufferUtils;
 import org.wizard.marketing.core.utils.ConnectionUtils;
 import redis.clients.jedis.Jedis;
+
+import java.util.Map;
 
 /**
  * @Author: sodamnsure
@@ -23,37 +25,29 @@ public class BufferManagerImpl implements BufferManager {
         period = config.getLong(InitialConfigConstants.REDIS_BUFFER_PERIOD);
     }
 
+
     @Override
     public BufferData getDataFromBuffer(String bufferKey) {
-        String value = jedis.get(bufferKey);
+        Map<String, String> valueMap = jedis.hgetAll(bufferKey);
 
-        return BufferUtils.of(bufferKey, value);
+        String[] split = bufferKey.split(":");
+        String deviceId = split[0];
+        String cacheId = split[1];
+
+        return new BufferData(deviceId, cacheId, valueMap);
     }
 
     @Override
     public boolean putDataToBuffer(BufferData bufferData) {
-        try {
-            jedis.psetex(bufferData.getBufferKey(), period, bufferData.getBufferValue());
-        } catch (Exception e) {
-            jedis.close();
-            jedis = ConnectionUtils.getRedisConnection();
+        String res = jedis.hmset(bufferData.getDeviceId() + ":" + bufferData.getCacheId(), bufferData.getValueMap());
 
-            return false;
-        }
-
-        return true;
+        return "OK".equals(res);
     }
 
-    public boolean putDataToBuffer(String bufferKey, String value) {
-        try {
-            jedis.psetex(bufferKey, period, value);
-        } catch (Exception e) {
-            jedis.close();
-            jedis = ConnectionUtils.getRedisConnection();
+    @Override
+    public boolean putDataToBuffer(String bufferKey, Map<String, String> valueMap) {
+        String res = jedis.hmset(bufferKey, valueMap);
 
-            return false;
-        }
-
-        return true;
+        return "OK".equals(res);
     }
 }
