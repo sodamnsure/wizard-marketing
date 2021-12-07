@@ -2,7 +2,6 @@ package org.wizard.marketing.core.buffer;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.apache.kafka.common.protocol.types.Field;
 import org.wizard.marketing.core.beans.BufferData;
 import org.wizard.marketing.core.constants.InitialConfigConstants;
 import org.wizard.marketing.core.utils.ConnectionUtils;
