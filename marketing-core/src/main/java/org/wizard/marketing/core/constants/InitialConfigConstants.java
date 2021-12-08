@@ -19,5 +19,5 @@ public class InitialConfigConstants {
 
     public static final String REDIS_HOST = "redis.host";
     public static final String REDIS_PORT = "redis.port";
-    public static final String REDIS_BUFFER_PERIOD = "redis.buffer.period";
+    public static final String REDIS_BUFFER_TTL = "redis.buffer.ttl";
 }

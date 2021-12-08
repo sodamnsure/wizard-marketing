@@ -16,4 +16,6 @@ public interface BufferManager {
     boolean putDataToBuffer(BufferData bufferData);
 
     boolean putDataToBuffer(String bufferKey, Map<String, String> valueMap);
+
+    void deleteBufferKey(String bufferKey, String key);
 }

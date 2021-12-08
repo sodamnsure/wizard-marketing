@@ -1,11 +1,14 @@
 package org.wizard.marketing.core.dao;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.wizard.marketing.core.beans.BufferData;
 import org.wizard.marketing.core.beans.CombCondition;
 import org.wizard.marketing.core.beans.Condition;
 import org.wizard.marketing.core.buffer.BufferManager;
 import org.wizard.marketing.core.buffer.BufferManagerImpl;
+import org.wizard.marketing.core.constants.InitialConfigConstants;
 import org.wizard.marketing.core.utils.EventUtils;
 
 import java.sql.Connection;
@@ -25,10 +28,14 @@ import java.util.stream.Collectors;
 public class ClickHouseQuerier {
     Connection conn;
     BufferManager bufferManager;
+    long bufferTtl;
 
     public ClickHouseQuerier(Connection conn) {
         this.conn = conn;
         bufferManager = new BufferManagerImpl();
+
+        Config config = ConfigFactory.load();
+        bufferTtl = config.getLong(InitialConfigConstants.REDIS_BUFFER_TTL);
     }
 
     /**
@@ -90,13 +97,21 @@ public class ClickHouseQuerier {
             可存在的优化空间：
                 查询时间范围为[t1 ~ t10], 缓存中存在的时间范围可能既有[t1 ~ t8], 还有[t2 ~ t10] 等等，这样可以选择一个最优的情况，而不是全部遍历
          */
-        BufferData bufferData = bufferManager.getDataFromBuffer(deviceId + ":" + combCondition.getCacheId());
+
+        String bufferKey = deviceId + ":" + combCondition.getCacheId();
+        BufferData bufferData = bufferManager.getDataFromBuffer(bufferKey);
         Map<String, String> valueMap = bufferData.getValueMap();
         Set<String> keySet = valueMap.keySet();
         for (String key : keySet) {
             String[] split = key.split(":");
             long bufferStartTime = Long.parseLong(split[0]);
             long bufferEndTime = Long.parseLong(split[1]);
+
+            // 判断缓存是否过期，做清除操作
+            long bufferInsertTime = Long.parseLong(split[2]);
+            if (System.currentTimeMillis() - bufferInsertTime >= bufferTtl) {
+                bufferManager.deleteBufferKey(bufferKey, key);
+            }
 
             String bufferSeqStr = valueMap.get(key);
 

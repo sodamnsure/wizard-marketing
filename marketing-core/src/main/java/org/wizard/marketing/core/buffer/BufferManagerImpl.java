@@ -16,12 +16,9 @@ import java.util.Map;
  */
 public class BufferManagerImpl implements BufferManager {
     Jedis jedis;
-    long period;
 
     public BufferManagerImpl() {
         jedis = ConnectionUtils.getRedisConnection();
-        Config config = ConfigFactory.load();
-        period = config.getLong(InitialConfigConstants.REDIS_BUFFER_PERIOD);
     }
 
 
@@ -48,5 +45,10 @@ public class BufferManagerImpl implements BufferManager {
         String res = jedis.hmset(bufferKey, valueMap);
 
         return "OK".equals(res);
+    }
+
+    @Override
+    public void deleteBufferKey(String bufferKey, String key) {
+        jedis.hdel(bufferKey, key);
     }
 }
