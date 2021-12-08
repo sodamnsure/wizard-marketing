@@ -1,6 +1,7 @@
 package org.wizard.marketing.core.dao;
 
 import lombok.extern.slf4j.Slf4j;
+import org.wizard.marketing.core.beans.BufferData;
 import org.wizard.marketing.core.beans.CombCondition;
 import org.wizard.marketing.core.beans.Condition;
 import org.wizard.marketing.core.buffer.BufferManager;
@@ -11,6 +12,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -63,6 +66,9 @@ public class ClickHouseQuerier {
 
     /**
      * 根据组合条件及查询的时间范围，查询该组合出现的次数
+     * <p>该逻辑实现中，没有考虑一个问题
+     * <p>valueMap中，可能同时存在多个时间区间，可能遇到一个满足条件的就返回了
+     * <p>最好的实现是，先遍历一遍valueMap，从中找到最优的缓存区间数据，然后再去判断
      *
      * @param deviceId        账户ID
      * @param combCondition   行为组合条件
@@ -72,7 +78,68 @@ public class ClickHouseQuerier {
      */
     public int getCombConditionCount(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
         // 缓存读处理
+        /*
+            缓存在什么情况下有用
+                缓存数据的时间范围为: [t3 ~ t8]
+                查询条件的时间范围如下几种情况有效
+                    1. [t3 ~ t8]  : 时间完全一致，直接用缓存的结果
+                    2. [t3 ~ t10] : 如果缓存的数据的阈值 >= 条件的阈值，则直接返回缓存结果, 否则，用缓存的结果拼接 [t8 ~ t10]的查询结果，作为整个返回结果
+                    3. [t1 ~ t8]  : 如果缓存的数据的阈值 >= 条件的阈值，则直接返回缓存结果, 否则，用[t1 ~ t3]的查询结果拼接缓存的结果，作为整个返回结果
+                    4. [t1 ~ t10] : 如果缓存的数据的阈值 >= 条件的阈值，则直接返回缓存结果, 否则，无用
 
+            可存在的优化空间：
+                查询时间范围为[t1 ~ t10], 缓存中存在的时间范围可能既有[t1 ~ t8], 还有[t2 ~ t10] 等等，这样可以选择一个最优的情况，而不是全部遍历
+         */
+        BufferData bufferData = bufferManager.getDataFromBuffer(deviceId + ":" + combCondition.getCacheId());
+        Map<String, String> valueMap = bufferData.getValueMap();
+        Set<String> keySet = valueMap.keySet();
+        for (String key : keySet) {
+            String[] split = key.split(":");
+            long bufferStartTime = Long.parseLong(split[0]);
+            long bufferEndTime = Long.parseLong(split[1]);
+
+            String bufferSeqStr = valueMap.get(key);
+
+            // 查询范围和缓存范围完全相同，直接返回缓存结果
+            if (bufferStartTime == queryRangeStart && bufferEndTime == queryRangeEnd) {
+                return EventUtils.eventSeqStrMatchRegexCount(bufferSeqStr, combCondition.getMatchPattern());
+            }
+
+            // 左端点对齐，但是条件的时间范围包含缓存的时间范围
+            if (bufferStartTime == queryRangeStart && bufferEndTime < queryRangeEnd) {
+                int bufferCount = EventUtils.eventSeqStrMatchRegexCount(bufferSeqStr, combCondition.getMatchPattern());
+                int queryMinCount = combCondition.getMinLimit();
+                if (bufferCount >= queryMinCount) {
+                    return bufferCount;
+                } else {
+                    // 调整查询时间，去ClickHouse中查询一小段
+                    String eventSeqStr = getCombConditionStr(deviceId, combCondition, bufferEndTime, queryRangeEnd);
+                    return EventUtils.eventSeqStrMatchRegexCount(bufferSeqStr + eventSeqStr, combCondition.getMatchPattern());
+                }
+            }
+
+            // 右端点对齐，但是条件的时间范围包含缓存的时间范围
+            if (bufferStartTime > queryRangeStart && bufferEndTime == queryRangeEnd) {
+                int bufferCount = EventUtils.eventSeqStrMatchRegexCount(bufferSeqStr, combCondition.getMatchPattern());
+                int queryMinCount = combCondition.getMinLimit();
+                if (bufferCount >= queryMinCount) {
+                    return bufferCount;
+                } else {
+                    // 调整查询时间，去ClickHouse中查询一小段
+                    String eventSeqStr = getCombConditionStr(deviceId, combCondition, queryRangeStart, bufferStartTime);
+                    return EventUtils.eventSeqStrMatchRegexCount(eventSeqStr + bufferSeqStr, combCondition.getMatchPattern());
+                }
+            }
+
+            // 条件的时间范围包含缓存的时间范围
+            if (bufferStartTime > queryRangeStart && bufferEndTime < queryRangeEnd) {
+                int bufferCount = EventUtils.eventSeqStrMatchRegexCount(bufferSeqStr, combCondition.getMatchPattern());
+                int queryMinCount = combCondition.getMinLimit();
+                if (bufferCount >= queryMinCount) {
+                    return bufferCount;
+                }
+            }
+        }
 
         // 先查询到用户在组合条件中做过的事件的字符串序列
         String eventSeqStr = getCombConditionStr(deviceId, combCondition, queryRangeStart, queryRangeEnd);
