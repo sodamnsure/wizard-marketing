@@ -23,7 +23,7 @@
         <redis.version>3.6.1</redis.version>
         <clickhouse.version>1.6-stable</clickhouse.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <log4j.slf4j.version>2.11.1</log4j.slf4j.version>
+        <log4j.slf4j.version>2.15.0</log4j.slf4j.version>
         <jackson.version>2.9.5</jackson.version>
         <lombok.version>1.18.12</lombok.version>
         <typesafe.version>1.4.0</typesafe.version>
