@@ -1,7 +1,7 @@
 package org.wizard.marketing.core.utils;
 
-import org.wizard.marketing.core.beans.Condition;
 import org.wizard.marketing.core.beans.CombCondition;
+import org.wizard.marketing.core.beans.Condition;
 import org.wizard.marketing.core.beans.MarketingRule;
 
 import java.util.Arrays;

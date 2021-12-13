@@ -1,9 +1,6 @@
 package org.wizard.marketing.core.buffer;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.wizard.marketing.core.beans.BufferData;
-import org.wizard.marketing.core.constants.InitialConfigConstants;
 import org.wizard.marketing.core.utils.ConnectionUtils;
 import redis.clients.jedis.Jedis;
 

@@ -2,9 +2,9 @@ package org.wizard.marketing.core.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.state.ListState;
+import org.wizard.marketing.core.beans.CombCondition;
 import org.wizard.marketing.core.beans.Condition;
 import org.wizard.marketing.core.beans.EventBean;
-import org.wizard.marketing.core.beans.CombCondition;
 import org.wizard.marketing.core.utils.EventUtils;
 
 import java.util.List;
