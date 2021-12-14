@@ -3,6 +3,7 @@ package org.wizard.marketing.core.service;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.flink.api.common.state.ListState;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.wizard.marketing.core.beans.CombCondition;
 import org.wizard.marketing.core.beans.EventBean;
 import org.wizard.marketing.core.constants.InitialConfigConstants;
@@ -79,17 +80,20 @@ public class TriggerModelServiceImpl {
             return count >= combCondition.getMinLimit() && count <= combCondition.getMaxLimit();
         } else if (timeRangeEnd < segmentPoint) {
             // 查ClickHouse
-            int count = clickHouseQuerier.getCombConditionCount(event.getDeviceId(), combCondition, timeRangeStart, timeRangeEnd);
-            return count >= combCondition.getMinLimit() && count <= combCondition.getMaxLimit();
+            Tuple2<String, Integer> resTuple = clickHouseQuerier.getCombConditionCount(event.getDeviceId(), combCondition, timeRangeStart, timeRangeEnd);
+            return resTuple.f1 >= combCondition.getMinLimit() && resTuple.f1 <= combCondition.getMaxLimit();
         } else {
             // 先查一次state，看是否能提前结束
             int stateCount = stateQuerier.getCombConditionCount(event.getDeviceId(), combCondition, segmentPoint, timeRangeEnd);
             if (stateCount >= combCondition.getMinLimit()) return true;
 
             // 先从ClickHouse中查询满足条件的事件序列字符串，拼接state中查询到满足条件的事件序列字符串，作为整体匹配正则表达式
-            String str1 = clickHouseQuerier.getCombConditionStr(event.getDeviceId(), combCondition, timeRangeStart, segmentPoint);
+            Tuple2<String, Integer> resTupleCk = clickHouseQuerier.getCombConditionCount(event.getDeviceId(), combCondition,
+                    timeRangeStart, segmentPoint, true);
+            if (resTupleCk.f1 >= combCondition.getMinLimit()) return true;
+
             String str2 = stateQuerier.getCombConditionStr(event.getDeviceId(), combCondition, segmentPoint, timeRangeEnd);
-            int count = EventUtils.eventSeqStrMatchRegexCount(str1 + str2, combCondition.getMatchPattern());
+            int count = EventUtils.eventSeqStrMatchRegexCount(resTupleCk.f0 + str2, combCondition.getMatchPattern());
 
             // 判断是否匹配成功
             return count >= combCondition.getMinLimit() && count <= combCondition.getMaxLimit();

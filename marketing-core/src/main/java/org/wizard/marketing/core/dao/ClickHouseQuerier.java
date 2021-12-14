@@ -3,6 +3,7 @@ package org.wizard.marketing.core.dao;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.wizard.marketing.core.beans.BufferData;
 import org.wizard.marketing.core.beans.CombCondition;
 import org.wizard.marketing.core.beans.Condition;
@@ -72,6 +73,20 @@ public class ClickHouseQuerier {
         return sb.toString();
     }
 
+
+    /**
+     * 根据组合条件及查询的时间范围，查询该组合出现的字符串以及次数
+     *
+     * @param deviceId        账户ID
+     * @param combCondition   行为组合条件
+     * @param queryRangeStart 查询时间范围起始
+     * @param queryRangeEnd   查询时间范围结束
+     * @return Tuple
+     */
+    public Tuple2<String, Integer> getCombConditionCount(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
+        return getCombConditionCount(deviceId, combCondition, queryRangeStart, queryRangeEnd, false);
+    }
+
     /**
      * 根据组合条件及查询的时间范围，查询该组合出现的次数
      * <p>该逻辑实现中，没有考虑一个问题
@@ -82,9 +97,10 @@ public class ClickHouseQuerier {
      * @param combCondition   行为组合条件
      * @param queryRangeStart 查询时间范围起始
      * @param queryRangeEnd   查询时间范围结束
+     * @param needWholeStr    是否需要返回全量字符串
      * @return 出现的次数
      */
-    public int getCombConditionCount(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
+    public Tuple2<String, Integer> getCombConditionCount(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd, boolean needWholeStr) throws Exception {
         String bufferKey = deviceId + ":" + combCondition.getCacheId();
         BufferData bufferData = bufferManager.getDataFromBuffer(bufferKey);
         Map<String, String> valueMap = bufferData.getValueMap();
@@ -103,6 +119,7 @@ public class ClickHouseQuerier {
             }
 
             String bufferSeqStr = valueMap.get(key);
+            int bufferCount = EventUtils.eventSeqStrMatchRegexCount(bufferSeqStr, combCondition.getMatchPattern());
 
             // 查询范围和缓存范围完全相同，直接返回缓存结果
             if (bufferStartTime == queryRangeStart && bufferEndTime == queryRangeEnd) {
@@ -113,15 +130,14 @@ public class ClickHouseQuerier {
                 putMap.put(bufferStartTime + ":" + bufferEndTime + ":" + current, bufferSeqStr);
                 bufferManager.putDataToBuffer(bufferKey, putMap);
 
-                return EventUtils.eventSeqStrMatchRegexCount(bufferSeqStr, combCondition.getMatchPattern());
+                return Tuple2.of(bufferSeqStr, bufferCount);
             }
 
             // 左端点对齐，但是条件的时间范围包含缓存的时间范围
             if (bufferStartTime == queryRangeStart && bufferEndTime < queryRangeEnd) {
-                int bufferCount = EventUtils.eventSeqStrMatchRegexCount(bufferSeqStr, combCondition.getMatchPattern());
                 int queryMinCount = combCondition.getMinLimit();
-                if (bufferCount >= queryMinCount) {
-                    return bufferCount;
+                if (bufferCount >= queryMinCount && !needWholeStr) {
+                    return Tuple2.of(bufferKey, bufferCount);
                 } else {
                     // 调整查询时间，去ClickHouse中查询一小段
                     String rightSeqStr = getCombConditionStr(deviceId, combCondition, bufferEndTime, queryRangeEnd);
@@ -136,16 +152,16 @@ public class ClickHouseQuerier {
                     putMap.put(bufferStartTime + ":" + queryRangeEnd + ":" + current, bufferSeqStr + rightSeqStr);
                     bufferManager.putDataToBuffer(bufferKey, putMap);
 
-                    return EventUtils.eventSeqStrMatchRegexCount(bufferSeqStr + rightSeqStr, combCondition.getMatchPattern());
+                    int totalCount = EventUtils.eventSeqStrMatchRegexCount(bufferSeqStr + rightSeqStr, combCondition.getMatchPattern());
+                    return Tuple2.of(bufferSeqStr + rightSeqStr, totalCount);
                 }
             }
 
             // 右端点对齐，但是条件的时间范围包含缓存的时间范围
             if (bufferStartTime > queryRangeStart && bufferEndTime == queryRangeEnd) {
-                int bufferCount = EventUtils.eventSeqStrMatchRegexCount(bufferSeqStr, combCondition.getMatchPattern());
                 int queryMinCount = combCondition.getMinLimit();
-                if (bufferCount >= queryMinCount) {
-                    return bufferCount;
+                if (bufferCount >= queryMinCount && !needWholeStr) {
+                    return Tuple2.of(bufferKey, bufferCount);
                 } else {
                     // 调整查询时间，去ClickHouse中查询一小段
                     String leftSeqStr = getCombConditionStr(deviceId, combCondition, queryRangeStart, bufferStartTime);
@@ -161,15 +177,15 @@ public class ClickHouseQuerier {
                     putMap.put(queryRangeStart + ":" + queryRangeEnd + ":" + current, leftSeqStr + bufferSeqStr);
                     bufferManager.putDataToBuffer(bufferKey, putMap);
 
-                    return EventUtils.eventSeqStrMatchRegexCount(leftSeqStr + bufferSeqStr, combCondition.getMatchPattern());
+                    int totalCount = EventUtils.eventSeqStrMatchRegexCount(leftSeqStr + bufferSeqStr, combCondition.getMatchPattern());
+                    return Tuple2.of(leftSeqStr + bufferSeqStr, totalCount);
                 }
             }
 
             // 条件的时间范围包含缓存的时间范围
             if (bufferStartTime > queryRangeStart && bufferEndTime < queryRangeEnd) {
-                int bufferCount = EventUtils.eventSeqStrMatchRegexCount(bufferSeqStr, combCondition.getMatchPattern());
                 int queryMinCount = combCondition.getMinLimit();
-                if (bufferCount >= queryMinCount) {
+                if (bufferCount >= queryMinCount && !needWholeStr) {
                     // 将原缓存结果删除
                     bufferManager.deleteBufferKey(bufferKey, key);
 
@@ -179,7 +195,7 @@ public class ClickHouseQuerier {
                     putMap.put(bufferStartTime + ":" + bufferEndTime + ":" + current, bufferSeqStr);
                     bufferManager.putDataToBuffer(bufferKey, putMap);
 
-                    return bufferCount;
+                    return Tuple2.of(bufferKey, bufferCount);
                 }
             }
         }
@@ -195,7 +211,7 @@ public class ClickHouseQuerier {
         int count = EventUtils.eventSeqStrMatchRegexCount(eventSeqStr, combCondition.getMatchPattern());
 
         log.debug("在ClickHouse中查询组合事件条件，得到的事件序列字符串: {}, 正则表达式: {}, 匹配结果: {}", eventSeqStr, combCondition.getMatchPattern(), count);
-        return count;
+        return Tuple2.of(eventSeqStr, count);
     }
 
 }
