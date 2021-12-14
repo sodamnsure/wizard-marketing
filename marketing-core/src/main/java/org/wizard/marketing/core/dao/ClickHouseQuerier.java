@@ -85,20 +85,6 @@ public class ClickHouseQuerier {
      * @return 出现的次数
      */
     public int getCombConditionCount(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
-        // 缓存读处理
-        /*
-            缓存在什么情况下有用
-                缓存数据的时间范围为: [t3 ~ t8]
-                查询条件的时间范围如下几种情况有效
-                    1. [t3 ~ t8]  : 时间完全一致，直接用缓存的结果
-                    2. [t3 ~ t10] : 如果缓存的数据的阈值 >= 条件的阈值，则直接返回缓存结果, 否则，用缓存的结果拼接 [t8 ~ t10]的查询结果，作为整个返回结果
-                    3. [t1 ~ t8]  : 如果缓存的数据的阈值 >= 条件的阈值，则直接返回缓存结果, 否则，用[t1 ~ t3]的查询结果拼接缓存的结果，作为整个返回结果
-                    4. [t1 ~ t10] : 如果缓存的数据的阈值 >= 条件的阈值，则直接返回缓存结果, 否则，无用
-
-            可存在的优化空间：
-                查询时间范围为[t1 ~ t10], 缓存中存在的时间范围可能既有[t1 ~ t8], 还有[t2 ~ t10] 等等，这样可以选择一个最优的情况，而不是全部遍历
-         */
-
         String bufferKey = deviceId + ":" + combCondition.getCacheId();
         BufferData bufferData = bufferManager.getDataFromBuffer(bufferKey);
         Map<String, String> valueMap = bufferData.getValueMap();
