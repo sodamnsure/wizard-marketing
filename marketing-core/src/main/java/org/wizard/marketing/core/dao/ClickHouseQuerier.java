@@ -49,7 +49,7 @@ public class ClickHouseQuerier {
      * @param queryRangeEnd   查询时间范围结束
      * @return 用户做过的组合条件中事件的字符串序列
      */
-    public String getCombConditionStr(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
+    private String getCombConditionStr(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
         String querySql = combCondition.getQuerySql();
         PreparedStatement stat = conn.prepareStatement(querySql);
 

@@ -18,6 +18,11 @@ public class MarketingRule {
     private String ruleId;
 
     /**
+     * KeyBy的字段, 逗号分隔
+     */
+    private String keyByFields;
+
+    /**
      * 触发条件
      */
     private Condition triggerCondition;

@@ -17,6 +17,7 @@ public class RuleMonitor {
     public static MarketingRule getRule() {
         MarketingRule rule = new MarketingRule();
         rule.setRuleId("rule_001");
+        rule.setKeyByFields("deviceId");
 
         // 设置触发事件
         HashMap<String, String> map = new HashMap<>();

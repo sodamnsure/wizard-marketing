@@ -10,6 +10,7 @@ import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.wizard.marketing.core.beans.EventBean;
 import org.wizard.marketing.core.beans.ResultBean;
+import org.wizard.marketing.core.functions.DynamicAllocateFunction;
 import org.wizard.marketing.core.functions.JsonToBeanFunction;
 import org.wizard.marketing.core.functions.KafkaSourceBuilder;
 import org.wizard.marketing.core.functions.RuleMatchFunction;
@@ -47,6 +48,8 @@ public class Main {
         WatermarkStrategy<EventBean> watermarkStrategy = WatermarkStrategy.<EventBean>forBoundedOutOfOrderness(Duration.ofMillis(0))
                 .withTimestampAssigner((SerializableTimestampAssigner<EventBean>) (eventBean, l) -> eventBean.getTimeStamp());
         SingleOutputStreamOperator<EventBean> streamWithWatermark = streamWithBean.assignTimestampsAndWatermarks(watermarkStrategy);
+
+        streamWithWatermark.process(new DynamicAllocateFunction());
 
         /*
           选取DeviceId作为Key
