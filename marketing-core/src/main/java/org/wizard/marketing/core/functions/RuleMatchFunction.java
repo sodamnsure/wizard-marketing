@@ -6,10 +6,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
-import org.wizard.marketing.core.beans.EventBean;
-import org.wizard.marketing.core.beans.MarketingRule;
-import org.wizard.marketing.core.beans.ResultBean;
-import org.wizard.marketing.core.beans.TimerCondition;
+import org.wizard.marketing.core.beans.*;
 import org.wizard.marketing.core.controller.TriggerModelController;
 import org.wizard.marketing.core.utils.RuleMonitor;
 import org.wizard.marketing.core.utils.StateDescContainer;
@@ -24,7 +21,7 @@ import java.util.List;
  * @Desc: 规则匹配函数
  */
 @Slf4j
-public class RuleMatchFunction extends KeyedProcessFunction<String, EventBean, ResultBean> {
+public class RuleMatchFunction extends KeyedProcessFunction<String, DynamicKeyedBean, ResultBean> {
     List<MarketingRule> ruleList;
     ListState<EventBean> listState;
     ListState<Tuple2<MarketingRule, Long>> ruleTimerState;
@@ -43,16 +40,20 @@ public class RuleMatchFunction extends KeyedProcessFunction<String, EventBean, R
     }
 
     @Override
-    public void processElement(EventBean event, Context context, Collector<ResultBean> collector) throws Exception {
+    public void processElement(DynamicKeyedBean dynamicKeyedBean, Context context, Collector<ResultBean> collector) throws Exception {
         // 将数据流事件放入state
+        EventBean event = dynamicKeyedBean.getEventBean();
         listState.add(event);
-        log.debug("接收到事件, 用户ID为：{}, 用户事件为: {}", event.getDeviceId(), event.getEventId());
 
         // 遍历所有规则
         for (MarketingRule rule : ruleList) {
             // 规则匹配计算
             log.debug("匹配一个规则：{}", rule.getRuleId());
-            boolean isMatch = triggerModelController.ruleIsMatch(rule, event);
+            // 判断规则中的分组依据，和当前进入的数据的分组依据，是否相同，相同才计算
+            boolean isMatch = false;
+            if (rule.getKeyByFields().equals(dynamicKeyedBean.getKeyNames())) {
+                isMatch = triggerModelController.ruleIsMatch(rule, event);
+            }
 
             // 如果满足
             if (isMatch) {

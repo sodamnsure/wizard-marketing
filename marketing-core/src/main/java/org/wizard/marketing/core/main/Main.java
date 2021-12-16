@@ -8,6 +8,7 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.wizard.marketing.core.beans.DynamicKeyedBean;
 import org.wizard.marketing.core.beans.EventBean;
 import org.wizard.marketing.core.beans.ResultBean;
 import org.wizard.marketing.core.functions.DynamicAllocateFunction;
@@ -49,17 +50,17 @@ public class Main {
                 .withTimestampAssigner((SerializableTimestampAssigner<EventBean>) (eventBean, l) -> eventBean.getTimeStamp());
         SingleOutputStreamOperator<EventBean> streamWithWatermark = streamWithBean.assignTimestampsAndWatermarks(watermarkStrategy);
 
-        streamWithWatermark.process(new DynamicAllocateFunction());
+        SingleOutputStreamOperator<DynamicKeyedBean> withDynamicKey = streamWithWatermark.process(new DynamicAllocateFunction());
 
         /*
           选取DeviceId作为Key
          */
-        KeyedStream<EventBean, String> keyedStream = streamWithWatermark.keyBy(EventBean::getDeviceId);
+        KeyedStream<DynamicKeyedBean, String> keyByStream = withDynamicKey.keyBy(bean -> bean.getKeyValue());
 
         /*
           规则计算
          */
-        SingleOutputStreamOperator<ResultBean> process = keyedStream.process(new RuleMatchFunction());
+        SingleOutputStreamOperator<ResultBean> process = keyByStream.process(new RuleMatchFunction());
 
         process.print();
 
