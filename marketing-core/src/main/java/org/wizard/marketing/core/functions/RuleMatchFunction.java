@@ -76,7 +76,7 @@ public class RuleMatchFunction extends KeyedProcessFunction<String, DynamicKeyed
     }
 
     @Override
-    public void onTimer(long timestamp, KeyedProcessFunction<String, EventBean, ResultBean>.OnTimerContext ctx, Collector<ResultBean> out) throws Exception {
+    public void onTimer(long timestamp, KeyedProcessFunction<String, DynamicKeyedBean, ResultBean>.OnTimerContext ctx, Collector<ResultBean> out) throws Exception {
         Iterable<Tuple2<MarketingRule, Long>> ruleTimerStateIterable = ruleTimerState.get();
         Iterator<Tuple2<MarketingRule, Long>> iterator = ruleTimerStateIterable.iterator();
         while (iterator.hasNext()) {
