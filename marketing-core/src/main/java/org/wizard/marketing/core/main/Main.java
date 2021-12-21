@@ -55,7 +55,7 @@ public class Main {
         /*
           选取DeviceId作为Key
          */
-        KeyedStream<DynamicKeyedBean, String> keyByStream = withDynamicKey.keyBy(bean -> bean.getKeyValue());
+        KeyedStream<DynamicKeyedBean, String> keyByStream = withDynamicKey.keyBy(DynamicKeyedBean::getKeyValue);
 
         /*
           规则计算

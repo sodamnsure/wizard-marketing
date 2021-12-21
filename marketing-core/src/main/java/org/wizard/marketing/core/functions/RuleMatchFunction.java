@@ -8,10 +8,9 @@ import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 import org.wizard.marketing.core.beans.*;
 import org.wizard.marketing.core.controller.TriggerModelController;
-import org.wizard.marketing.core.utils.RuleMonitor;
+import org.wizard.marketing.core.utils.RuleSimulatorFromJson;
 import org.wizard.marketing.core.utils.StateDescContainer;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,8 +29,7 @@ public class RuleMatchFunction extends KeyedProcessFunction<String, DynamicKeyed
     @Override
     public void open(Configuration parameters) throws Exception {
         // 用模拟器获取一个规则
-        MarketingRule rule = RuleMonitor.getRule();
-        ruleList = Collections.singletonList(rule);
+        ruleList = RuleSimulatorFromJson.getRule();
         // 获取触发形规则模型Controller
         listState = getRuntimeContext().getListState(StateDescContainer.getEventBeansDesc());
         triggerModelController = new TriggerModelController(listState);

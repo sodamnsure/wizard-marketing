@@ -54,17 +54,17 @@ public class RuleMonitor {
 
         String eventId1 = "A";
         HashMap<String, String> map3 = new HashMap<>();
-        //map3.put("p3", "v2");
+        map3.put("p3", "v2");
         Condition e1 = new Condition(eventId1, map3, st, ed, 1, 999);
 
         String eventId2 = "C";
         HashMap<String, String> map4 = new HashMap<>();
-        //map3.put("p3", "v2");
+        map3.put("p3", "v2");
         Condition e2 = new Condition(eventId2, map4, st, ed, 1, 999);
 
         String eventId3 = "F";
         HashMap<String, String> map5 = new HashMap<>();
-        //map3.put("p3", "v2");
+        map3.put("p3", "v2");
         Condition e3 = new Condition(eventId3, map5, st, ed, 1, 999);
 
         String sql2 = "select eventId\n" +
@@ -78,5 +78,12 @@ public class RuleMonitor {
         rule.setActionConditions(Arrays.asList(combCondition1, combCondition2));
 
         return rule;
+    }
+
+    public static void main(String[] args) {
+        MarketingRule rule = getRule();
+        String json = JsonParseUtils.toJsonString(rule);
+        System.out.println(json);
+
     }
 }

@@ -6,10 +6,10 @@ import org.apache.flink.util.Collector;
 import org.wizard.marketing.core.beans.DynamicKeyedBean;
 import org.wizard.marketing.core.beans.EventBean;
 import org.wizard.marketing.core.beans.MarketingRule;
-import org.wizard.marketing.core.utils.RuleMonitor;
+import org.wizard.marketing.core.utils.RuleSimulatorFromJson;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -22,14 +22,11 @@ public class DynamicAllocateFunction extends ProcessFunction<EventBean, DynamicK
     HashSet<String> keyByFieldsSet;
 
     @Override
-    public void open(Configuration parameters) {
+    public void open(Configuration parameters) throws IOException {
         // 获取规则中所有的规则列表
-        MarketingRule rule1 = RuleMonitor.getRule();
-        MarketingRule rule2 = RuleMonitor.getRule();
-        rule2.setKeyByFields("ip");
+        List<MarketingRule> ruleList = RuleSimulatorFromJson.getRule();
 
         // 从规则列表中遍历每个规则，获取每个规则的keyBy字段，并放入set集合去重
-        List<MarketingRule> ruleList = Arrays.asList(rule1, rule2);
         keyByFieldsSet = new HashSet<>();
         for (MarketingRule rule : ruleList) {
             keyByFieldsSet.add(rule.getKeyByFields());

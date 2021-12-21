@@ -1,0 +1,38 @@
+{
+  "ruleId": "rule_002",
+  "keyByFields": "ip",
+  "triggerCondition": {
+    "eventId": "K",
+    "eventProps": {},
+    "timeRangeStart": -1,
+    "timeRangeEnd": 9223372036854776000,
+    "minLimit": 0,
+    "maxLimit": 0
+  },
+  "matchLimit": 0,
+  "profileConditions": {},
+  "actionConditions": [
+    {
+      "timeRangeStart": -1,
+      "timeRangeEnd": 9223372036854776000,
+      "conditionList": [
+        {
+          "eventId": "K",
+          "eventProps": {},
+          "timeRangeStart": -1,
+          "timeRangeEnd": 9223372036854776000,
+          "minLimit": 3,
+          "maxLimit": 999
+        }
+      ],
+      "matchPattern": "(1)",
+      "minLimit": 1,
+      "maxLimit": 999,
+      "sqlType": "ck",
+      "querySql": "select eventId\nfrom default.event_detail\n where eventId = 'K'\n and ip = ?\n  and timeStamp between ? and ?",
+      "cacheId": "001"
+    }
+  ],
+  "timerConditions": null,
+  "onTimer": false
+}

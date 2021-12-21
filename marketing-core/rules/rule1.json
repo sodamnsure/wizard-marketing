@@ -1,0 +1,83 @@
+{
+  "ruleId": "rule_001",
+  "keyByFields": "deviceId",
+  "triggerCondition": {
+    "eventId": "K",
+    "eventProps": {
+      "p2": "v1"
+    },
+    "timeRangeStart": -1,
+    "timeRangeEnd": 9223372036854776000,
+    "minLimit": 1,
+    "maxLimit": 999
+  },
+  "matchLimit": 0,
+  "profileConditions": {
+    "k1": "v1"
+  },
+  "actionConditions": [
+    {
+      "timeRangeStart": -1,
+      "timeRangeEnd": 9223372036854776000,
+      "conditionList": [
+        {
+          "eventId": "S",
+          "eventProps": {
+            "p1": "v6",
+            "p7": "v1"
+          },
+          "timeRangeStart": -1,
+          "timeRangeEnd": 9223372036854776000,
+          "minLimit": 1,
+          "maxLimit": 999
+        }
+      ],
+      "matchPattern": "(1)",
+      "minLimit": 1,
+      "maxLimit": 999,
+      "sqlType": "ck",
+      "querySql": "select eventId\nfrom default.event_detail\nwhere eventId = 'S'\n  and properties['p1'] = 'v6'\n  and properties['p7'] = 'v1'\n  and deviceId = ?\n  and timeStamp between ? and ?",
+      "cacheId": "001"
+    },
+    {
+      "timeRangeStart": -1,
+      "timeRangeEnd": 9223372036854776000,
+      "conditionList": [
+        {
+          "eventId": "A",
+          "eventProps": {
+            "p3": "v2"
+          },
+          "timeRangeStart": -1,
+          "timeRangeEnd": 9223372036854776000,
+          "minLimit": 1,
+          "maxLimit": 999
+        },
+        {
+          "eventId": "C",
+          "eventProps": {},
+          "timeRangeStart": -1,
+          "timeRangeEnd": 9223372036854776000,
+          "minLimit": 1,
+          "maxLimit": 999
+        },
+        {
+          "eventId": "F",
+          "eventProps": {},
+          "timeRangeStart": -1,
+          "timeRangeEnd": 9223372036854776000,
+          "minLimit": 1,
+          "maxLimit": 999
+        }
+      ],
+      "matchPattern": "(1.*2.*3)",
+      "minLimit": 1,
+      "maxLimit": 999,
+      "sqlType": "ck",
+      "querySql": "select eventId\nfrom default.event_detail\nwhere deviceId = ?\nand timeStamp between ? and ?\nand (eventId = 'A' or eventId = 'C' or eventId = 'F')",
+      "cacheId": "002"
+    }
+  ],
+  "timerConditions": null,
+  "onTimer": false
+}
