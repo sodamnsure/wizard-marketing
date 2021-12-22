@@ -102,4 +102,9 @@ public class EventBean {
      * 事件属性
      */
     private Map<String, String> properties;
+
+    /**
+     * 在添加动态keyBy后添加的一个功能字段
+     */
+    private String keyByValue;
 }

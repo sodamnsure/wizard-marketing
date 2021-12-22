@@ -47,7 +47,11 @@ public class DynamicAllocateFunction extends ProcessFunction<EventBean, DynamicK
 
                 sb.append(fieldValue).append(",");
             }
-            DynamicKeyedBean dynamicKeyedBean = new DynamicKeyedBean(sb.substring(0, sb.length() - 1), keyByFields, eventBean);
+
+            String keyByValue = sb.substring(0, sb.length() - 1);
+            eventBean.setKeyByValue(keyByValue);
+
+            DynamicKeyedBean dynamicKeyedBean = new DynamicKeyedBean(keyByValue, keyByFields, eventBean);
             collector.collect(dynamicKeyedBean);
         }
     }
