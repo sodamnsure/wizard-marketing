@@ -66,7 +66,7 @@ public class RuleMatchFunction extends KeyedProcessFunction<String, DynamicKeyed
                     // 在定时信息State中记录
                     ruleTimerState.add(Tuple2.of(rule, triggerTime));
                 } else {
-                    ResultBean resultBean = new ResultBean(event.getDeviceId(), rule.getRuleId(), event.getTimeStamp(), System.currentTimeMillis());
+                    ResultBean resultBean = new ResultBean(event.getKeyByValue(), rule.getRuleId(), event.getTimeStamp(), System.currentTimeMillis());
                     collector.collect(resultBean);
                 }
             }

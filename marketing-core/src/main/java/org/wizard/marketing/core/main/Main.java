@@ -53,7 +53,7 @@ public class Main {
         SingleOutputStreamOperator<DynamicKeyedBean> withDynamicKey = streamWithWatermark.process(new DynamicAllocateFunction());
 
         /*
-          选取DeviceId作为Key
+          选取keyByValue作为Key
          */
         KeyedStream<DynamicKeyedBean, String> keyByStream = withDynamicKey.keyBy(DynamicKeyedBean::getKeyValue);
 

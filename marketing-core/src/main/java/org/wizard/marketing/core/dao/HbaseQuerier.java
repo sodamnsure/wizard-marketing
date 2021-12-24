@@ -30,13 +30,13 @@ public class HbaseQuerier {
      * 从hbase中查询画像条件是否满足
      *
      * @param profileConditions 画像条件 {标签名->标签值，标签名->标签值,........}
-     * @param deviceId          账户ID
+     * @param keyByValue        等同于用户ID
      * @return 是否匹配
      * @throws Exception 异常
      */
-    public boolean queryProfileConditionIsMatch(Map<String, String> profileConditions, String deviceId) throws Exception {
+    public boolean queryProfileConditionIsMatch(Map<String, String> profileConditions, String keyByValue) throws Exception {
         // 设置行键
-        Get get = new Get(deviceId.getBytes());
+        Get get = new Get(keyByValue.getBytes());
         // 获取画像条件的标签key
         Set<String> tags = profileConditions.keySet();
         // 封装列

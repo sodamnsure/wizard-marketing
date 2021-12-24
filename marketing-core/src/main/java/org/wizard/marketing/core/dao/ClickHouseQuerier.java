@@ -43,17 +43,17 @@ public class ClickHouseQuerier {
     /**
      * 根据组合条件及查询的时间范围，得到返回结果的[1212]形式的字符串序列
      *
-     * @param deviceId        账户ID
+     * @param keyByValue      分组key
      * @param combCondition   行为组合条件
      * @param queryRangeStart 查询时间范围起始
      * @param queryRangeEnd   查询时间范围结束
      * @return 用户做过的组合条件中事件的字符串序列
      */
-    private String getCombConditionStr(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
+    private String getCombConditionStr(String keyByValue, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
         String querySql = combCondition.getQuerySql();
         PreparedStatement stat = conn.prepareStatement(querySql);
 
-        stat.setString(1, deviceId);
+        stat.setString(1, keyByValue);
         stat.setLong(2, queryRangeStart);
         stat.setLong(3, queryRangeEnd);
 
@@ -77,14 +77,14 @@ public class ClickHouseQuerier {
     /**
      * 根据组合条件及查询的时间范围，查询该组合出现的字符串以及次数
      *
-     * @param deviceId        账户ID
+     * @param keyByValue      分组key
      * @param combCondition   行为组合条件
      * @param queryRangeStart 查询时间范围起始
      * @param queryRangeEnd   查询时间范围结束
      * @return Tuple
      */
-    public Tuple2<String, Integer> getCombConditionCount(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
-        return getCombConditionCount(deviceId, combCondition, queryRangeStart, queryRangeEnd, false);
+    public Tuple2<String, Integer> getCombConditionCount(String keyByValue, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
+        return getCombConditionCount(keyByValue, combCondition, queryRangeStart, queryRangeEnd, false);
     }
 
     /**
@@ -93,15 +93,15 @@ public class ClickHouseQuerier {
      * <p>valueMap中，可能同时存在多个时间区间，可能遇到一个满足条件的就返回了
      * <p>最好的实现是，先遍历一遍valueMap，从中找到最优的缓存区间数据，然后再去判断
      *
-     * @param deviceId        账户ID
+     * @param keyByValue      分组key
      * @param combCondition   行为组合条件
      * @param queryRangeStart 查询时间范围起始
      * @param queryRangeEnd   查询时间范围结束
      * @param needWholeStr    是否需要返回全量字符串
      * @return 出现的次数
      */
-    public Tuple2<String, Integer> getCombConditionCount(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd, boolean needWholeStr) throws Exception {
-        String bufferKey = deviceId + ":" + combCondition.getCacheId();
+    public Tuple2<String, Integer> getCombConditionCount(String keyByValue, CombCondition combCondition, long queryRangeStart, long queryRangeEnd, boolean needWholeStr) throws Exception {
+        String bufferKey = keyByValue + ":" + combCondition.getCacheId();
         BufferData bufferData = bufferManager.getDataFromBuffer(bufferKey);
         Map<String, String> valueMap = bufferData.getValueMap();
         Set<String> keySet = valueMap.keySet();
@@ -140,7 +140,7 @@ public class ClickHouseQuerier {
                     return Tuple2.of(bufferKey, bufferCount);
                 } else {
                     // 调整查询时间，去ClickHouse中查询一小段
-                    String rightSeqStr = getCombConditionStr(deviceId, combCondition, bufferEndTime, queryRangeEnd);
+                    String rightSeqStr = getCombConditionStr(keyByValue, combCondition, bufferEndTime, queryRangeEnd);
                     // 将原缓存结果删除
                     bufferManager.deleteBufferKey(bufferKey, key);
 
@@ -164,7 +164,7 @@ public class ClickHouseQuerier {
                     return Tuple2.of(bufferKey, bufferCount);
                 } else {
                     // 调整查询时间，去ClickHouse中查询一小段
-                    String leftSeqStr = getCombConditionStr(deviceId, combCondition, queryRangeStart, bufferStartTime);
+                    String leftSeqStr = getCombConditionStr(keyByValue, combCondition, queryRangeStart, bufferStartTime);
 
                     // 将原缓存结果删除
                     bufferManager.deleteBufferKey(bufferKey, key);
@@ -201,7 +201,7 @@ public class ClickHouseQuerier {
         }
 
         // 先查询到用户在组合条件中做过的事件的字符串序列
-        String eventSeqStr = getCombConditionStr(deviceId, combCondition, queryRangeStart, queryRangeEnd);
+        String eventSeqStr = getCombConditionStr(keyByValue, combCondition, queryRangeStart, queryRangeEnd);
         // 将查询结果写入缓存
         HashMap<String, String> putMap = new HashMap<>();
         putMap.put(queryRangeStart + ":" + queryRangeEnd + ":" + current, eventSeqStr);

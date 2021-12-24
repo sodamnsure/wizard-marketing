@@ -25,13 +25,13 @@ public class StateQuerier {
     /**
      * 根据组合条件及查询的时间范围，得到返回结果的[1212]形式的字符串序列
      *
-     * @param deviceId        账户ID
+     * @param keyByValue      分组key
      * @param combCondition   行为组合条件
      * @param queryRangeStart 查询时间范围起始
      * @param queryRangeEnd   查询时间范围结束
      * @return 用户做过的组合条件中事件的字符串序列
      */
-    public String getCombConditionStr(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
+    public String getCombConditionStr(String keyByValue, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
         // 获取state中的数据迭代器
         Iterable<EventBean> eventBeans = listState.get();
         // 获取组合条件中的感兴趣的事件
@@ -55,15 +55,15 @@ public class StateQuerier {
     /**
      * 根据组合条件及查询的时间范围，查询该组合出现的次数
      *
-     * @param deviceId        账户ID
+     * @param keyByValue      分组key
      * @param combCondition   行为组合条件
      * @param queryRangeStart 查询时间范围起始
      * @param queryRangeEnd   查询时间范围结束
      * @return 出现的次数
      */
-    public int getCombConditionCount(String deviceId, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
+    public int getCombConditionCount(String keyByValue, CombCondition combCondition, long queryRangeStart, long queryRangeEnd) throws Exception {
         // 先查询到用户在组合条件中做过的事件的字符串序列
-        String eventSeqStr = getCombConditionStr(deviceId, combCondition, queryRangeStart, queryRangeEnd);
+        String eventSeqStr = getCombConditionStr(keyByValue, combCondition, queryRangeStart, queryRangeEnd);
         // 调用工具，来获取事件序列与正则表达式的匹配次数--即组合条件发生的次数
         int count = EventUtils.eventSeqStrMatchRegexCount(eventSeqStr, combCondition.getMatchPattern());
 

@@ -52,12 +52,12 @@ public class TriggerModelServiceImpl {
      * 画像条件匹配
      *
      * @param profileCondition 画像条件
-     * @param deviceId         账户ID
+     * @param keyByValue       分组key
      * @return 是否匹配
      * @throws Exception 异常
      */
-    public boolean matchProfileCondition(Map<String, String> profileCondition, String deviceId) throws Exception {
-        return hbaseQuerier.queryProfileConditionIsMatch(profileCondition, deviceId);
+    public boolean matchProfileCondition(Map<String, String> profileCondition, String keyByValue) throws Exception {
+        return hbaseQuerier.queryProfileConditionIsMatch(profileCondition, keyByValue);
     }
 
     /**
@@ -76,23 +76,23 @@ public class TriggerModelServiceImpl {
         long timeRangeEnd = combCondition.getTimeRangeEnd();
         if (timeRangeStart >= segmentPoint) {
             // 查状态
-            int count = stateQuerier.getCombConditionCount(event.getDeviceId(), combCondition, timeRangeStart, timeRangeEnd);
+            int count = stateQuerier.getCombConditionCount(event.getKeyByValue(), combCondition, timeRangeStart, timeRangeEnd);
             return count >= combCondition.getMinLimit() && count <= combCondition.getMaxLimit();
         } else if (timeRangeEnd < segmentPoint) {
             // 查ClickHouse
-            Tuple2<String, Integer> resTuple = clickHouseQuerier.getCombConditionCount(event.getDeviceId(), combCondition, timeRangeStart, timeRangeEnd);
+            Tuple2<String, Integer> resTuple = clickHouseQuerier.getCombConditionCount(event.getKeyByValue(), combCondition, timeRangeStart, timeRangeEnd);
             return resTuple.f1 >= combCondition.getMinLimit() && resTuple.f1 <= combCondition.getMaxLimit();
         } else {
             // 先查一次state，看是否能提前结束
-            int stateCount = stateQuerier.getCombConditionCount(event.getDeviceId(), combCondition, segmentPoint, timeRangeEnd);
+            int stateCount = stateQuerier.getCombConditionCount(event.getKeyByValue(), combCondition, segmentPoint, timeRangeEnd);
             if (stateCount >= combCondition.getMinLimit()) return true;
 
             // 先从ClickHouse中查询满足条件的事件序列字符串，拼接state中查询到满足条件的事件序列字符串，作为整体匹配正则表达式
-            Tuple2<String, Integer> resTupleCk = clickHouseQuerier.getCombConditionCount(event.getDeviceId(), combCondition,
+            Tuple2<String, Integer> resTupleCk = clickHouseQuerier.getCombConditionCount(event.getKeyByValue(), combCondition,
                     timeRangeStart, segmentPoint, true);
             if (resTupleCk.f1 >= combCondition.getMinLimit()) return true;
 
-            String str2 = stateQuerier.getCombConditionStr(event.getDeviceId(), combCondition, segmentPoint, timeRangeEnd);
+            String str2 = stateQuerier.getCombConditionStr(event.getKeyByValue(), combCondition, segmentPoint, timeRangeEnd);
             int count = EventUtils.eventSeqStrMatchRegexCount(resTupleCk.f0 + str2, combCondition.getMatchPattern());
 
             // 判断是否匹配成功

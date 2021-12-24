@@ -18,7 +18,7 @@ public class BufferData {
     /**
      * 账号
      */
-    private String deviceId;
+    private String keyByValue;
 
     /**
      * 缓存ID

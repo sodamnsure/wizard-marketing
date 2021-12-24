@@ -24,10 +24,10 @@ public class BufferManagerImpl implements BufferManager {
         Map<String, String> valueMap = jedis.hgetAll(bufferKey);
 
         String[] split = bufferKey.split(":");
-        String deviceId = split[0];
+        String keyByValue = split[0];
         String cacheId = split[1];
 
-        return new BufferData(deviceId, cacheId, valueMap);
+        return new BufferData(keyByValue, cacheId, valueMap);
     }
 
     @Override
