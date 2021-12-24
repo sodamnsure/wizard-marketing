@@ -31,13 +31,6 @@ public class BufferManagerImpl implements BufferManager {
     }
 
     @Override
-    public boolean putDataToBuffer(BufferData bufferData) {
-        String res = jedis.hmset(bufferData.getDeviceId() + ":" + bufferData.getCacheId(), bufferData.getValueMap());
-
-        return "OK".equals(res);
-    }
-
-    @Override
     public boolean putDataToBuffer(String bufferKey, Map<String, String> valueMap) {
         String res = jedis.hmset(bufferKey, valueMap);
 
