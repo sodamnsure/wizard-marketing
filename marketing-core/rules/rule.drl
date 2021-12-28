@@ -1,0 +1,44 @@
+import org.wizard.marketing.core.beans.RuleControllerFact
+import org.wizard.marketing.core.beans.MarketingRule
+import org.wizard.marketing.core.beans.EventBean
+import org.wizard.marketing.core.beans.Condition
+import org.wizard.marketing.core.utils.EventUtils
+import java.util.Map
+import org.wizard.marketing.core.beans.CombCondition
+import java.util.List
+import org.wizard.marketing.core.service.TriggerModelServiceImpl
+
+
+rule "rule"
+    when
+        $fact:RuleControllerFact()
+    then
+        MarketingRule rule = $fact.getMarketingRule();
+        EventBean event = $fact.getEventBean();
+        TriggerModelServiceImpl triggerModelService = $fact.getTriggerModelService();
+
+        Condition triggerCondition = rule.getTriggerCondition();
+        // 判断当前事件是否满足规则的触发条件
+        if (EventUtils.eventMatchCondition(event, triggerCondition)) {
+            // 判断是否满足画像条件
+            Map<String, String> profileConditions = rule.getProfileConditions();
+            if (profileConditions != null && profileConditions.size() > 0) {
+                // 画像条件在动态keyBy中，只有用户ID作为key的时候，才会存在，所以此时的 `event.getKeyByValue()` 等于 `event.getDeviceId()`
+                boolean b = triggerModelService.matchProfileCondition(profileConditions, event.getKeyByValue());
+                // 如果画像条件满足，继续计算组合行为条件
+                if (b) {
+                    // 判断是否满足组合条件
+                    List<CombCondition> actionConditions = rule.getActionConditions();
+                    if (actionConditions != null && actionConditions.size() > 0) {
+                        // 一次取一个"组合条件"进行计算
+                        for (CombCondition combCondition : actionConditions) {
+                            boolean b2 = triggerModelService.matchCombCondition(event, combCondition);
+                            // 后面会使用规则系统动态判断多个组合条件之间的且与或关系
+                            $fact.setMatchResult(b2);
+                        }
+                    }
+                }
+            }
+        }
+
+end

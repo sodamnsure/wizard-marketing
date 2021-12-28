@@ -7,7 +7,9 @@ package org.wizard.marketing.core.utils;
  */
 public class RuleManagerSimulator {
     // 插入新规则到MySQL
+    public void insertRule() {
 
+    }
 
     // 更新已存在的规则
 
