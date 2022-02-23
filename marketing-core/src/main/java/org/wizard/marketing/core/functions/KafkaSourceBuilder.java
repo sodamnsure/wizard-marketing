@@ -20,12 +20,12 @@ public class KafkaSourceBuilder {
         config = ConfigFactory.load();
     }
 
-    public FlinkKafkaConsumer<String> build() {
+    public FlinkKafkaConsumer<String> build(String topic) {
         Properties props = new Properties();
         props.setProperty("bootstrap.servers", config.getString(InitialConfigConstants.KAFKA_BOOTSTRAP_SERVERS));
         props.setProperty("auto.offset.reset", config.getString(InitialConfigConstants.KAFKA_AUTO_OFFSET_RESET));
 
-        String topic = config.getString(InitialConfigConstants.KAFKA_ACTION_DETAIL_TOPIC);
+        //String topic = config.getString(InitialConfigConstants.KAFKA_ACTION_DETAIL_TOPIC);
 
         return new FlinkKafkaConsumer<>(topic, new SimpleStringSchema(), props);
     }

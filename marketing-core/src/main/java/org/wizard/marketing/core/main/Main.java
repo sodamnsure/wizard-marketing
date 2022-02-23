@@ -4,6 +4,7 @@ import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
@@ -36,7 +37,13 @@ public class Main {
           读取kafka中的用户行为日志
          */
         KafkaSourceBuilder kafkaSourceBuilder = new KafkaSourceBuilder();
-        DataStream<String> stream = env.addSource(kafkaSourceBuilder.build());
+        DataStream<String> stream = env.addSource(kafkaSourceBuilder.build("ActionLog"));
+
+        /*
+          服务kafka中的规则操作数据流
+         */
+        DataStreamSource<String> ruleBinlogDS = env.addSource(kafkaSourceBuilder.build("rule-demo"));
+
 
         /*
           Json解析
